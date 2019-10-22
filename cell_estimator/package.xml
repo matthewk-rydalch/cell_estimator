@@ -1,0 +1,18 @@
+<package format="2">
+  
+  <name>cell_estimator</name>
+  <version>0.0.0</version>
+  <description>This package estimates position based on cell phone sensors</description>
+
+  <maintainer email="matthewk.rydalch@gmail.com">Matthew Rydalch</maintainer>
+  
+  <license></license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_export_depend>rospy</build_export_depend>
+  <exec_depend>rospy</exec_depend>
+
+</package>
+
