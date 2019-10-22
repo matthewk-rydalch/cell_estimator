@@ -1,18 +1,22 @@
-<package format="2">
+<package format="3">
   
   <name>cell_estimator</name>
   <version>0.0.0</version>
-  <description>This package estimates position based on cell phone sensors</description>
+  <description>cell phone localization package</description>
 
   <maintainer email="matthewk.rydalch@gmail.com">Matthew Rydalch</maintainer>
   
-  <license></license>
+  <license>TODO</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <author email="michael.eyler@byu.edu">Michael Eyler</author>
+
+  <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
   <build_depend>message_generation</build_depend>
-  <build_depend>rospy</build_depend>
-  <build_export_depend>rospy</build_export_depend>
-  <exec_depend>rospy</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
+
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+  <!-- <depend>cell_msgs</depend> -->
 
 </package>
 
