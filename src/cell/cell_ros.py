@@ -1,35 +1,42 @@
 #!/usr/bin/env python3
 
+from IPython.core.debugger import set_trace
 import rospy
 from std_msgs.msg import String
-from imu.msg import geometry_msgs
+from cell_estimator.msg import imu
 
 def cell_ros():
 
-	# rospy.Subscriber('multirotor/imu', roscop_imu, self.roscopImuCallback)
-	# rospy.Subscriber('rover/RelPosNED', rtk_relposned, self.rtkRelposnedCallback)
-	# rospy.Subscriber('cell/imu', cell_imu, self.cellImuCallback)
-	# rospy.Subscriber('cell/RelPosNED', cell_RelPosNED, self.cellRelposnedCallback)
-	
 	pub = rospy.Publisher('cell/imu', imu, queue_size=1024) #can include a queue size.  See ros docs for publishers
 	rospy.init_node('cell_ros', anonymous=True)
-	rate = rospy.Rate(10) # 10hz
+
+	#example of how to set up a subscriber can be seen in estimator_ros.py
+
 	while not rospy.is_shutdown():
 
 		imu_data = imu()
 
-		imu_data.var = 5.0
+		#quaternian
+		imu_data.orientation.x = 1.0
+		imu_data.orientation.y = 2.0
+		imu_data.orientation.z = 3.0
+		imu_data.orientation.w = 4.0
+
+		imu_data.orientation_covariance = [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 1.0]
+
+		imu_data.angular_velocity.x = 1.0
+		imu_data.angular_velocity.y = 3.0
+		imu_data.angular_velocity.z = 2.0
+
+		imu_data.angular_velocity_covariance = [2.0, 5.0, 5.0, 8.0, 5.0, 5.0, 5.0, 5.0, 1.0]
+
+		imu_data.linear_acceleration.x = 2.0
+		imu_data.linear_acceleration.y = 1.0
+		imu_data.linear_acceleration.z = 3.0
+
+		imu_data.linear_acceleration_covariance = [4.0, 5.0, 5.0, 5.0, 5.0, 5.0, 9.0, 0.0, 1.0]
 
 		pub.publish(imu_data)
-
-		rate.sleep()
-		rospy.spin()
-
-		# ###michael, this is just to test the ros publisher.  If you do use this, comment out rospy.spin() Otherwise keep what is below commented out
-		# hello_str = "hello world %s" % rospy.get_time()
-		# rospy.loginfo(hello_str)
-		# pub.publish(hello_str)
-		# rate.sleep()
 
 if __name__ == '__main__':
 	cell_ros()
