@@ -13,6 +13,8 @@ add_message_files(
 	DIRECTORY msg
 	FILES
 	imu.msg
+	RelPos.msg
+	PositionVelocityTime.msg
 	)
 
 generate_messages(

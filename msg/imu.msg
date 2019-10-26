@@ -1,6 +1,8 @@
 #I left the types that are inside each part of the message for convenience.
 #Do not uncomment them.
 
+#this message matches that of roscopter for imu
+
 std_msgs/Header header
 #  uint32 seq
 #  time stamp
