@@ -11,12 +11,12 @@
   <author email="michael.eyler@byu.edu">Michael Eyler</author>
 
   <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
+
+  <depend>std_msgs</depend> 
+  <depend>geometry_msgs</depend>
+
   <build_depend>message_generation</build_depend>
   <exec_depend>message_runtime</exec_depend>
-
-  <depend>rospy</depend>
-  <depend>std_msgs</depend>
-  <!-- <depend>cell_msgs</depend> -->
 
 </package>
 

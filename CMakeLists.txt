@@ -3,12 +3,27 @@ project(cell_estimator)
 
 find_package(catkin REQUIRED COMPONENTS
   message_generation
+  roscpp
   rospy
   std_msgs
-  # cell_msgs
+  geometry_msgs
 )
 
+add_message_files(
+	DIRECTORY msg
+	FILES
+	imu.msg
+	RelPos.msg
+	PositionVelocityTime.msg
+	)
+
+generate_messages(
+	DEPENDENCIES
+	std_msgs
+	geometry_msgs
+	)
+
 catkin_package(
-   CATKIN_DEPENDS std_msgs rospy
+   CATKIN_DEPENDS message_runtime std_msgs
 )
 
