@@ -47,6 +47,7 @@ def cell_ros():
 		pub_NED.publish(NED_data)
 		pub_lla.publish(lla_data)
 
+
 if __name__ == '__main__':
 	cell_ros()
 		
