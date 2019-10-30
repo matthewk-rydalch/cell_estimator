@@ -9,9 +9,9 @@ from cell_estimator.msg import PositionVelocityTime
 
 def cell_ros():
 
-	pub_imu = rospy.Publisher('cell/imu', imu, queue_size=1024) #I just used the queue size from latis
-	pub_NED = rospy.Publisher('cell/NED', RelPos, queue_size=1024) 
-	pub_lla = rospy.Publisher('cell/lla', PositionVelocityTime, queue_size=1024) 
+	pub_imu = rospy.Publisher('imu', imu, queue_size=1024) #I just used the queue size from latis
+	pub_NED = rospy.Publisher('NED', RelPos, queue_size=1024) 
+	pub_lla = rospy.Publisher('lla', PositionVelocityTime, queue_size=1024) 
 
 	rospy.init_node('cell_ros', anonymous=True)
 
@@ -22,7 +22,6 @@ def cell_ros():
 		imu_data = imu()
 		NED_data = RelPos()
 		lla_data = PositionVelocityTime()
-
 		#quaternian
 		imu_data.orientation.x = 1.0
 		imu_data.orientation.y = 2.0

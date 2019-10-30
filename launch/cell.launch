@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+	<node name="cell" pkg="cell_estimator" type="cell_ros.py" output="screen"/>
+	<node name="estimator" pkg="cell_estimator" type="estimator_ros.py" output="screen"/> 
+</launch>
