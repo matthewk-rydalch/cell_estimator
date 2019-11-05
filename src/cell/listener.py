@@ -10,7 +10,7 @@ class udp_receiver():
 
     def __init__(self):
         # Set our class attributes (persistant variables)
-        self.udp_port = 12345
+        self.udp_port = 1234
         self.buffer_size = 2048
 
         # Define a socket listener to receive the radar packets
@@ -20,7 +20,7 @@ class udp_receiver():
         #  Open UDP Socket
         self.sock.bind(('', self.udp_port))
         self.sock.setblocking(True)
-        print('UDP socket 12345 opened.')
+        print('UDP socket', str(self.udp_port), ' opened.')
 
         #  Read in Data
         while True:
@@ -47,9 +47,6 @@ class udp_receiver():
                 print("lat:", lat)
                 print("lon:", lon)
                 print("alt:", alt)
-                # print(lat, ",", lon)
-            #
-            #     print("Test:", )
                 accel = info[three:four-2].split(',')
                 print("Accel:", accel)
                 x_accel = float(accel[1])
