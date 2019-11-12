@@ -6,14 +6,16 @@ from std_msgs.msg import String
 from cell_estimator.msg import imu
 from cell_estimator.msg import RelPos
 from cell_estimator.msg import PositionVelocityTime
+from ublox.msg import PositionVelocityTime
+from listener import udp_receiver
 
 def cell_ros():
 
+	rospy.init_node('cell_ros', anonymous=True)
+	rospy.Subscriber('base/lla', PositionVelocityTime, cell.base_lla_callback)
 	pub_imu = rospy.Publisher('imu', imu, queue_size=1024) #I just used the queue size from latis
 	pub_NED = rospy.Publisher('NED', RelPos, queue_size=1024) 
 	pub_lla = rospy.Publisher('lla', PositionVelocityTime, queue_size=1024) 
-
-	rospy.init_node('cell_ros', anonymous=True)
 
 	#example of how to set up a subscriber can be seen in estimator_ros.py
 
@@ -48,5 +50,6 @@ def cell_ros():
 
 
 if __name__ == '__main__':
+	cell = udp_receiver()
 	cell_ros()
 		
