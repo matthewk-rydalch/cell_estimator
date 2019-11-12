@@ -3,7 +3,7 @@
 import rospy
 import socket
 import numpy as np
-from latis_msgs.msg import raw_radar
+# from latis_msgs.msg import raw_radar
 import time
 
 class udp_receiver():
@@ -84,6 +84,9 @@ class udp_receiver():
 
     def run_receiver(self):
         self.main_loop()
+
+    def base_lla_callback(self):
+        print('got lla callback')
 
 if __name__ == '__main__':
     receiver = udp_receiver()

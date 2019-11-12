@@ -3,11 +3,13 @@
 from IPython.core.debugger import set_trace
 import rospy
 from std_msgs.msg import String
+import numpy as np
+import socket
 from cell_estimator.msg import imu
 from cell_estimator.msg import RelPos
 from cell_estimator.msg import PositionVelocityTime
-import numpy as np
-import socket
+from ublox.msg import PositionVelocityTime
+from listener import udp_receiver
 
 DEBUGGER = False
 origin = np.array([0,0,0])
@@ -18,6 +20,8 @@ def printer(str1, str2):
 
 def cell_ros():
 
+	rospy.init_node('cell_ros', anonymous=True)
+	rospy.Subscriber('base/lla', PositionVelocityTime, cell.base_lla_callback)
 	pub_imu = rospy.Publisher('imu', imu, queue_size=1024) #I just used the queue size from latis
 	pub_NED = rospy.Publisher('NED', RelPos, queue_size=1024)
 	pub_lla = rospy.Publisher('lla', PositionVelocityTime, queue_size=1024)
@@ -159,4 +163,5 @@ def GPS2NED(self, lat, lon, alt):
 
 
 if __name__ == '__main__':
+	cell = udp_receiver()
 	cell_ros()
