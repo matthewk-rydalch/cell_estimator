@@ -40,8 +40,7 @@ class Eif():
             #reassign Omg to Omg_bar until all markers are accounted for
             Omg_bar = Omg_bar+Ht.T@inv(Qt)@Ht
             #reassign Ks to Ks_bar until all markers are accounted for
-            Ks_bar = Ks_bar+Ht.T@inv(Qt)@(np.array([Zt[:,i]]).T-np.array([h_function[:,i]]).T+Ht@mu_bar)
-
+            Ks_bar = Ks_bar+Ht.T@inv(Qt)@(utils.wrap(np.array([Zt[:,i]]).T-np.array([h_function[:,i]]).T)+Ht@mu_bar)
         Ks = Ks_bar
         Omg = Omg_bar
 

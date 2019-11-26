@@ -28,21 +28,8 @@ from ublox.msg import PositionVelocityTime
 from ublox.msg import RelPos
 from estimator import Estimator
 
-
 #################################
 def driver():
-
-	####need to get these parameters.  They were given in the assigment.
-	# Xtr = self.Xtr #from rover/RelPos
-	# Rtr = self.Rtr #different measurement model.  Will come from cell/NED.  Make this N?
-	# Phi_tr = self.Phi_tr #different measurement model.  Will come from cell/NED.  Make this E?
-	# M = self.M #not needed for NE measurements.  Could use the base?
-	# V = self.V #velocity comes from integrating accel from imu
-	# vc = self.vc
-	# W = self.W #angular velocity comes from integrating angular accel from imu
-	# wc = self.wc
-	# Uc = self.Uc #just a combination of the two.
-	# Time = self.Time #comes from ROS?
 
 	#parameters
 	xlim = 30.0 #m
@@ -57,6 +44,31 @@ def driver():
 	th0 = th0*math.pi/180
 	#alitude does not change
 
+	####need to get these parameters instead of using the parameters below.
+	# Xtr = self.Xtr #from rover/RelPos
+	# Rtr = self.Rtr #different measurement model.  Will come from cell/NED.  Make this N?
+	# Phi_tr = self.Phi_tr #different measurement model.  Will come from cell/NED.  Make this E?
+	# M = self.M #not needed for NE measurements.  Could use the base?
+	# V = self.V #velocity comes from integrating accel from imu
+	# vc = self.vc
+	# W = self.W #angular velocity comes from integrating angular accel from imu
+	# wc = self.wc
+	# Uc = self.Uc #just a combination of the two.
+	# Time = self.Time #comes from ROS?
+
+	#read in given data
+	path = rospy.get_param('/estimator/path')
+	given = sio.loadmat(path + '/src/estimator/midterm_data.mat')
+	Xtr = given['X_tr']
+	Rtr = given['range_tr']
+	Phi_tr = given['bearing_tr']
+	M = given['m'].astype('float')
+	V = given['v']
+	vc = given['v_c']
+	W = given['om']
+	wc = given['om_c']
+	Uc = np.squeeze(np.array([vc,wc]))
+	Time = given['t']
 	dt = 0.1 #seconds, this correlates with given Time
 	tf = 30.0 #seconds, this correlates with given Time
 
@@ -78,7 +90,7 @@ def driver():
 	eif = Eif(mr.dyn_2d, mr.model_sensor, dt, sig_v, sig_w, sig_r, sig_phi, M)
 
 	#loop through algorithm for each time step
-	for i in range(len(self.Time[0])):
+	for i in range(len(Time[0])):
 		Om = inv(Sig)
 		Ks = Om@Mu
 		# Ut = mr.get_vel(Uc[:,i]) #use the given velocities

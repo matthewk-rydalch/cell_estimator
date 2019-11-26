@@ -75,7 +75,7 @@ class Visualizer:
 
         #run the animation
         ani = animation.FuncAnimation(fig, update,
-                            init_func=init, frames = 201, interval = 20, blit=True)
+                            init_func=init, frames = 301, interval = 20, blit=True)
         plt.show()
 
     def plotter(self, Ks_hat, Mu_hat, Xtr, error, Sig_hat, Z_hat, Rtr, Phi_tr, t):

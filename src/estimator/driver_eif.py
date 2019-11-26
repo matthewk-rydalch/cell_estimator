@@ -67,12 +67,13 @@ viz = Visualizer(xlim, ylim)
 eif = Eif(mr.dyn_2d, mr.model_sensor, dt, sig_v, sig_w, sig_r, sig_phi, M)
 
 #loop through algorithm for each time step
+Dif = []
 for i in range(len(Time[0])):
     Om = inv(Sig)
     Ks = Om@Mu
-    # Ut = mr.get_vel(Uc[:,i]) #use the given velocities
-    # Zt = mr.model_sensor(Mu) #use the given measurements
-    Ut = np.array([vc[0][i],wc[0][i]])
+    Ut = mr.get_vel(Uc[:,i]) #to calculate velocities rather than use the given
+    # Zt = mr.model_sensor(Mu) #to calculate measurements rather than use the given
+    # Ut = np.array([vc[0][i],wc[0][i]])
     Zt = np.array([Rtr[i],Phi_tr[i]])
     Ks, Om = eif.ext_info_filter(Ks, Om, Ut, Zt)
     Sig = inv(Om)
