@@ -10,7 +10,7 @@ from cell_estimator.msg import PositionVelocityTime
 import time
 import val
 
-DEBUGGER = True
+DEBUGGER = False
 
 def printer(str1, str2):
 	if DEBUGGER:
@@ -21,7 +21,7 @@ class udp_receiver():
 
     def __init__(self):
         # Set our class attributes (persistant variables)
-        self.udp_port = 1234
+        self.udp_port = 5555
         self.buffer_size = 2048
         self.BASE_FOUND = False
 

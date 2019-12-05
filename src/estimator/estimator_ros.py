@@ -46,8 +46,8 @@ def driver():
 
 	####need to get these parameters instead of using the parameters below.
 	# Xtr = self.Xtr #from rover/RelPos
-	# Rtr = self.Rtr #different measurement model.  Will come from cell/NED.  Make this N?
-	# Phi_tr = self.Phi_tr #different measurement model.  Will come from cell/NED.  Make this E?
+	# Rtr = self.Rtr #different measurement model.  Will come from cell/NED.  Make this N? range truth
+	# Phi_tr = self.Phi_tr #different measurement model.  Will come from cell/NED.  Make this E? bearing truth
 	# M = self.M #not needed for NE measurements.  Could use the base?
 	# V = self.V #velocity comes from integrating accel from imu
 	# vc = self.vc
@@ -128,8 +128,8 @@ def ros_estimator():
 #
 
 if __name__ == '__main__':
-	
-	driver()
+
+	# driver()
 	est = Estimator()
 	ros_estimator()
 #
