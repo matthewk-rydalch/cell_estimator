@@ -1,7 +1,7 @@
 import socket, traceback
 
 host = '192.168.1.239'
-port = 12345
+port = 5555
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
