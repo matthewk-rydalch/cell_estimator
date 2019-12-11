@@ -3,7 +3,7 @@
 
 #this message matches that of roscopter for imu
 
-std_msgs/Header header
+Header header
 #  uint32 seq
 #  time stamp
 #  string frame_id

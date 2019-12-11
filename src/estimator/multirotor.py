@@ -34,16 +34,19 @@ class Multirotor:
 
         return Xt
 
-    def get_vel(self, Uc, noise = 1):
+    def get_vel(self, accel, time, noise = 1):
 
-        vc = Uc[0]
-        wc = Uc[1]
+        a_t = accel[0]
+        alpha_t = accel[1]
 
-        epv = noise*np.random.normal(0, self.sig_v)
-        epw = noise*np.random.normal(0, self.sig_w)
+        self.v_t = a_t*dt+self.v_prev
+        self.omega_t = alpha_t*dt+self.omega_prev
 
-        vt = vc+epv
-        wt = wc+epw
+        # epv = noise*np.random.normal(0, self.sig_v)
+        # epw = noise*np.random.normal(0, self.sig_w)
+        #
+        # vt = vc+epv
+        # wt = wc+epw
 
         Ut = np.array([vt, wt])
 
