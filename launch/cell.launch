@@ -2,23 +2,23 @@
 <launch>
 
 	<group ns="base">
-		<node pkg="rosbag" type="play" name="f9p" args="--clock $(find cell_estimator)/bags/base.bag"/>
+		<node pkg="rosbag" type="play" name="f9p" args="--clock $(find cell_estimator)/bags/base2.bag"/>
 	</group>
 
 	<group ns="rover">
-		<node pkg="rosbag" type="play" name="f9p" args="--clock $(find cell_estimator)/bags/rover3.bag"/>
-	</group>
-
-	<group ns="cell">
-		<node pkg="rosbag" type="play" name="cell" args="--clock $(find cell_estimator)/bags/cell3.bag"/>
+		<node pkg="rosbag" type="play" name="f9p" args="--clock $(find cell_estimator)/bags/rover5.bag"/>
 	</group>
 
 	<!-- <group ns="cell"> -->
-	<!-- <node name="cell" pkg="cell_estimator" type="cell_ros.py" output="screen"/> -->
+	<node pkg="rosbag" type="play" name="cell_data" args="--clock $(find cell_estimator)/bags/cell5.bag"/>
 	<!-- </group> -->
 
-	<!-- <node name="estimator" pkg="cell_estimator" type="estimator_ros.py">
+	<!-- <group ns="cell"> -->
+	<node name="cell" pkg="cell_estimator" type="cell_ros.py" output="screen"/>
+	<!-- </group> -->
+
+	<node name="estimator" pkg="cell_estimator" type="estimator_ros.py" output="screen">
 		<param name="path" value="$(find cell_estimator)"/>
-	</node> -->
+	</node>
 
 </launch>

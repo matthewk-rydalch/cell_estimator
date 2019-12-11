@@ -123,7 +123,6 @@ def ros_estimator():
 	rospy.Subscriber('NED', RelPos, est.ned_callback)
 	rospy.Subscriber('lla', PositionVelocityTime, est.lla_callback)
 	rospy.Subscriber('rover/RelPos', RelPos, est.rover_RelPos_callback)
-	rospy.Subscriber('cell/clock', cell_time, est.rover_RelPos_callback)
 
 	rospy.spin()
 #
