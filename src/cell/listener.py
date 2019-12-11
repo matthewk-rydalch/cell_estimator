@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import rospy
+# import std_msgs.msg
+
 import socket
 import numpy as np
 # from latis_msgs.msg import raw_radar
@@ -13,8 +15,8 @@ import val
 DEBUGGER = False
 
 def printer(str1, str2):
-	if DEBUGGER:
-		print(str1, str2)
+    if DEBUGGER:
+        print(str1, str2)
 
 
 class udp_receiver():
@@ -70,7 +72,6 @@ class udp_receiver():
             lla_data.lla[1] = lon
             lla_data.lla[2] = alt
             lla_data.header.stamp = rospy.Time.now()
- 
             self.pub_lla.publish(lla_data)
             if self.BASE_FOUND:
                 ned = self.GPS2NED(lat,lon,alt)
@@ -105,7 +106,8 @@ class udp_receiver():
             imu_data.angular_velocity.x = x_gyro
             imu_data.angular_velocity.y = y_gyro
             imu_data.angular_velocity.z = z_gyro
-            lla_data.header.stamp = rospy.Time.now()
+            imu_data.header.stamp = rospy.Time.now()
+            print("time", rospy.Time.now())
             self.pub_imu.publish(imu_data)
         print("Done reading.")
 

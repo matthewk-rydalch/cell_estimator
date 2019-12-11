@@ -36,7 +36,7 @@ class Estimator():
 		self.Ks = Om@Mu
 
     def imu_callback(self, data):
-        Ut = get_vel(data)
+        Ut = get_vel(data, time)
         self.Ks, self.Om = propagate(Ut)
 
 
