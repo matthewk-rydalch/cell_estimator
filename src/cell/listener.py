@@ -69,12 +69,15 @@ class udp_receiver():
             lla_data.lla[0] = lat
             lla_data.lla[1] = lon
             lla_data.lla[2] = alt
+            lla_data.header.stamp = rospy.Time.now()
+ 
             self.pub_lla.publish(lla_data)
             if self.BASE_FOUND:
-                ned = GPS2NED(lat,lon,alt)
+                ned = self.GPS2NED(lat,lon,alt)
                 NED_data.relPosNED[0] = ned[0]
                 NED_data.relPosNED[1] = ned[1]
                 NED_data.relPosNED[2] = ned[2]
+                NED_data.header.stamp = rospy.Time.now()
                 self.pub_NED.publish(NED_data)
 
         if three != -1:
@@ -102,6 +105,7 @@ class udp_receiver():
             imu_data.angular_velocity.x = x_gyro
             imu_data.angular_velocity.y = y_gyro
             imu_data.angular_velocity.z = z_gyro
+            lla_data.header.stamp = rospy.Time.now()
             self.pub_imu.publish(imu_data)
         print("Done reading.")
 

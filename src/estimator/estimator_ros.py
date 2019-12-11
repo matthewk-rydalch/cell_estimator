@@ -119,10 +119,11 @@ def driver():
 
 def ros_estimator():
 	rospy.init_node('estimator', anonymous=True)
-	rospy.Subscriber('cell/imu', imu, est.imu_callback)
-	rospy.Subscriber('cell/NED', RelPos, est.ned_callback)
-	rospy.Subscriber('cell/lla', PositionVelocityTime, est.lla_callback)
+	rospy.Subscriber('imu', imu, est.imu_callback)
+	rospy.Subscriber('NED', RelPos, est.ned_callback)
+	rospy.Subscriber('lla', PositionVelocityTime, est.lla_callback)
 	rospy.Subscriber('rover/RelPos', RelPos, est.rover_RelPos_callback)
+	rospy.Subscriber('cell/clock', cell_time, est.rover_RelPos_callback)
 
 	rospy.spin()
 #

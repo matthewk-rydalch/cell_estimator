@@ -27,7 +27,7 @@ def cell_ros():
 
 
 if __name__ == '__main__':
-	rospy.init_node('cell_ros', anonymous=True)
-	cell = udp_receiver()
-	cell_ros()
+	# rospy.init_node('cell_ros', anonymous=True)
+	# cell = udp_receiver()
+	# cell_ros()
 	# cell.run_receiver()

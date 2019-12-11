@@ -1,37 +1,24 @@
 <?xml version="1.0"?>
 <launch>
+
+	<group ns="base">
+		<node pkg="rosbag" type="play" name="f9p" args="--clock $(find cell_estimator)/bags/base.bag"/>
+	</group>
+
+	<group ns="rover">
+		<node pkg="rosbag" type="play" name="f9p" args="--clock $(find cell_estimator)/bags/rover3.bag"/>
+	</group>
+
+	<group ns="cell">
+		<node pkg="rosbag" type="play" name="cell" args="--clock $(find cell_estimator)/bags/cell3.bag"/>
+	</group>
+
 	<!-- <group ns="cell"> -->
-	<node name="cell" pkg="cell_estimator" type="cell_ros.py" output="screen"/>
+	<!-- <node name="cell" pkg="cell_estimator" type="cell_ros.py" output="screen"/> -->
 	<!-- </group> -->
 
 	<!-- <node name="estimator" pkg="cell_estimator" type="estimator_ros.py">
 		<param name="path" value="$(find cell_estimator)"/>
 	</node> -->
-
-	<!-- For both base and rover, you need to determine if you will use the rosbag or the module. -->
-	<!-- Then comment out the other. -->
-	<group ns="base">
-		<!-- <node name="f9p" pkg="ublox" type="ublox_ros">
-				<param name="serial_port" value="/dev/ttyACM0"/>
-				<param name="rtk_type" value="3"/>
-				<param name="local_host" value="localhost"/>
-				<param name="local_port" value="16140"/>
-				<param name="remote_host" value="localhost"/>
-				<param name="remote_port" value="16145"/>
-		</node> -->
-		<node pkg="rosbag" type="play" name="f9p" args="--clock $(find cell_estimator)/bags/aug1_utc_base1.bag"/>
-	</group>
-
-	<group ns="rover">
-		<!-- <node name="f9p" pkg="ublox" type="ublox_ros">
-				<param name="serial_port" value="/dev/ttyACM1"/>
-				<param name="rtk_type" value="2"/>
-				<param name="local_host" value="localhost"/>
-				<param name="local_port" value="16145"/>
-				<param name="remote_host" value="localhost"/>
-				<param name="remote_port" value="16140"/>
-		</node> -->
-		<node pkg="rosbag" type="play" name="f9p" args="--clock $(find cell_estimator)/bags/aug1_utc_walk_01.bag"/>
-	</group>
 
 </launch>
