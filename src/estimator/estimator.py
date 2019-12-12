@@ -1,43 +1,59 @@
 import rospy
+import numpy as np
+from importlib import reload, import_module
+import math
+from numpy.linalg import inv
+
+multirotor = reload(import_module("multirotor"))
+from multirotor import Multirotor
+visualizer = reload(import_module("visualizer"))
+from visualizer import Visualizer
+eif = reload(import_module("eif"))
+from eif import Eif
+utils = reload(import_module("utils"))
+
+
 DEBUG = False
 def printer(statement):
     if DEBUG:
         printer(statement)
 
 class Estimator():
-    # def __init__():
+    def __init__(self):
 
-    #     #parameters
-    #     self.xlim = 30.0 #m
-    #     self.ylim = 30.0 #m
-    #     self.sig_r = 0.2 #m
-    #     self.sig_phi = 0.1 #rad
-    #     self.sig_v = 0.15 #m/s
-    #     self.sig_w = 0.1 #rad/s
-    #     self.N0 = 0.0 #m
-    #     self.E0 = 0.0 #m
-    #     #alitude does not change
+        #parameters
+        xlim = 30.0 #m
+        ylim = 30.0 #m
+        sig_gps = 3 #m
+        sig_accel = 1 #m/s^2
+        sig_gyro = 1 #m^2/s^2
+        # sig_r = 0.2 #m
+        # sig_phi = 0.1 #rad
+        # sig_v = 0.15 #m/s
+        # sig_w = 0.1 #rad/s
+        N0 = 0.0 #m
+        E0 = 0.0 #m
+        #alitude does not change
 
-    # 	#my specified parameters and variables
-    #     self.Sig = np.array([[1.0, 0.0, 0.0],
-    #                         [0.0, 1.0, 0.0],
-    #                         [0.0, 0.0, 1.0]])
+    	#my specified parameters and variables
+        Sig = np.array([[1.0, 0.0],
+                        [0.0, 1.0]])
 
-    #     self.Mu = np.array([[self.x0],[self.y0],[self.th0]])
+        Mu = np.array([[N0],[E0]])
 
-    #     self.Sig_hist = []
-    #     self.Mu_hist = []
-    #     self.Ks_hist = []
-    #     self.Z_hist = []
+        Sig_hist = []
+        Mu_hist = []
+        Ks_hist = []
+        Z_hist = []
 
-    #     #instantiate classes
-    #     self.mr = Multirotor(sig_v, sig_w, sig_r, sig_phi, dt, M)
-    #     self.viz = Visualizer(xlim, ylim)
-    #     self.eif = Eif(mr.dyn_2d, mr.model_sensor, dt, sig_v, sig_w, sig_r, sig_phi, M)
+        #instantiate classes
+        mr = Multirotor(sig_accel, sig_gyro, sig_gps)
+        viz = Visualizer(xlim, ylim)
+        eif = Eif(mr.dyn_2d, mr.model_sensor, sig_accel, sig_gyro, sig_gps)
 
-    #     #convert to information form
-    #     self.Om = inv(Sig)
-    #     self.Ks = Om@Mu
+        #convert to information form
+        Om = inv(Sig)
+        Ks = Om@Mu
 
     def imu_callback(self, data):
         # Ut = get_vel(data, time)

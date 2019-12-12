@@ -10,15 +10,13 @@ import utils
 
 
 class Eif():
-    def __init__(self, dyn_2d, model_sensor, dt, sig_v, sig_w, sig_r, sig_phi, M):
+    def __init__(self, dyn_2d, model_sensor, sig_accel, sig_gyro, sig_gps):
         self.dyn_2d = dyn_2d
         self.model_sensor = model_sensor
-        self.dt = dt
-        self.sig_v = sig_v
-        self.sig_w = sig_w
-        self.sig_r = sig_r
-        self.sig_phi = sig_phi
-        self.M = M
+        self.t_prev = 0
+        self.sig_accel = sig_accel
+        self.sig_gyro = sig_gyro
+        self.sig_gps = sig_gps
 
     def ext_info_filter(self, Ksp, Omp, Ut, Zt):
 

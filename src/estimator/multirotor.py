@@ -10,18 +10,16 @@ from IPython.core.debugger import set_trace
 utils = reload(import_module("utils"))
 
 class Multirotor:
-    def __init__(self, sig_v, sig_w, sig_r, sig_phi, dt, M):
-        self.sig_v = sig_v
-        self.sig_w = sig_w
-        self.sig_r = sig_r
-        self.sig_phi = sig_phi
-        self.dt = dt
-        self.M = M
+    def __init__(self, sig_accel, sig_gyro, sig_gps):
+        self.sig_accel = sig_accel
+        self.sig_gyro = sig_gyro
+        self.sig_gps = sig_gps
+        self.t_prev = 0 #used to calculate dt
 
-    def dyn_2d(self, Xp, Ut):
+    def dyn_2d(self, Xp, Ut, time):
 
-        xp = Xp[0][0]
-        yp = Xp[1][0]
+        Np = Xp[0][0]
+        Ep = Xp[1][0]
         thp = Xp[2][0]
         vt = Ut[0]
         wt = Ut[1]

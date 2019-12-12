@@ -85,9 +85,9 @@ def driver():
 	Z_hist = []
 
 	#instantiate classes
-	mr = Multirotor(sig_v, sig_w, sig_r, sig_phi, dt, M)
+	mr = Multirotor(sig_accel, sig_gyro, sig_gps)
 	viz = Visualizer(xlim, ylim)
-	eif = Eif(mr.dyn_2d, mr.model_sensor, dt, sig_v, sig_w, sig_r, sig_phi, M)
+	eif = Eif(mr.dyn_2d, mr.model_sensor, sig_accel, sig_gyro, sig_gps)
 
 	#loop through algorithm for each time step
 	for i in range(len(Time[0])):
