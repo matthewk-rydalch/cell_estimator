@@ -1,47 +1,75 @@
 import rospy
+import numpy as np
+from importlib import reload, import_module
+import math
+from numpy.linalg import inv
+
+multirotor = reload(import_module("multirotor"))
+from multirotor import Multirotor
+visualizer = reload(import_module("visualizer"))
+from visualizer import Visualizer
+eif = reload(import_module("eif"))
+from eif import Eif
+utils = reload(import_module("utils"))
+
+
 DEBUG = False
 def printer(statement):
     if DEBUG:
         printer(statement)
 
 class Estimator():
-    # def __init__():
+    def __init__(self):
 
-    #     #parameters
-    #     self.xlim = 30.0 #m
-    #     self.ylim = 30.0 #m
-    #     self.sig_r = 0.2 #m
-    #     self.sig_phi = 0.1 #rad
-    #     self.sig_v = 0.15 #m/s
-    #     self.sig_w = 0.1 #rad/s
-    #     self.N0 = 0.0 #m
-    #     self.E0 = 0.0 #m
-    #     #alitude does not change
+        #parameters
+        xlim = 30.0 #m
+        ylim = 30.0 #m
+        sig_gps = 3 #m
+        sig_accel = 1 #m/s^2
+        sig_gyro = 1 #m^2/s^2
+        # sig_r = 0.2 #m
+        # sig_phi = 0.1 #rad
+        # sig_v = 0.15 #m/s
+        # sig_w = 0.1 #rad/s
+        N0 = 0.0 #m
+        E0 = 0.0 #m
+        #alitude does not change
 
-    # 	#my specified parameters and variables
-    #     self.Sig = np.array([[1.0, 0.0, 0.0],
-    #                         [0.0, 1.0, 0.0],
-    #                         [0.0, 0.0, 1.0]])
+    	#my specified parameters and variables
+        Sig = np.array([[1.0, 0.0],
+                        [0.0, 1.0]])
 
-    #     self.Mu = np.array([[self.x0],[self.y0],[self.th0]])
+        Mu = np.array([[N0],[E0]])
 
-    #     self.Sig_hist = []
-    #     self.Mu_hist = []
-    #     self.Ks_hist = []
-    #     self.Z_hist = []
+        Sig_hist = []
+        Mu_hist = []
+        Ks_hist = []
+        Z_hist = []
 
-    #     #instantiate classes
-    #     self.mr = Multirotor(sig_v, sig_w, sig_r, sig_phi, dt, M)
-    #     self.viz = Visualizer(xlim, ylim)
-    #     self.eif = Eif(mr.dyn_2d, mr.model_sensor, dt, sig_v, sig_w, sig_r, sig_phi, M)
+        #instantiate classes
+        mr = Multirotor(sig_accel, sig_gyro, sig_gps)
+        viz = Visualizer(xlim, ylim)
+        eif = Eif(mr.dyn_2d, mr.model_sensor, sig_accel, sig_gyro, sig_gps)
+        self.mr = mr
+        self.viz = viz
+        self.eif = eif
 
-    #     #convert to information form
-    #     self.Om = inv(Sig)
-    #     self.Ks = Om@Mu
+        #convert to information form
+        self.Om = inv(Sig)
+        self.Ks = self.Om@Mu
 
     def imu_callback(self, data):
-        # Ut = get_vel(data, time)
-        # self.Ks, self.Om = propagate(Ut)
+        accel_x = data.linear_acceleration.x
+        accel_y = data.linear_acceleration.y
+        accel_z = data.linear_acceleration.z
+        accel = np.array([[accel_x],[accel_y],[accel_z]])
+        omega_x = data.angular_velocity.x
+        omega_y = data.angular_velocity.y
+        omega_z = data.angular_velocity.z
+        omega = np.array([[omega_x],[omega_y],[omega_z]])
+        time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
+        Ut = self.mr.get_vel(accel, omega, time)
+        self.Ks, self.Om = self.eif.prediction(Ut)
         printer('got imu')
 
     def ned_callback(self, data):
@@ -62,21 +90,6 @@ class Estimator():
         printer("rover_RelPos_callback \n")
 
     # def get_vel(self):
-
-    # def propagate(self, Ut):
-    #     #prediction step
-    #     Mup = inv(Omp)@Ksp
-    #     # Mup[2] = utils.wrap(Mup[2]) #could be wrapped, but to match true theta, don't
-    #     thp = Mup[2]
-    #     Gt, Rt= self.mr.propogation_matrices(Ut, thp)
-    #     Omg_bar = inv(Gt@inv(Omp)@Gt.T+Rt)
-    #     g_function = self.dyn_2d(Mup, Ut) #g is needed for both prediction and measurement
-    #     Ks_bar = Omg_bar@g_function
-
-    #     Ks = Ks_bar
-    #     Omg = Omg_bar
-
-    #     return Ks, Omg
 
     # def measurement(self, ned):
     #     #measurement step for each marker

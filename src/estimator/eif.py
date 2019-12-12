@@ -10,27 +10,33 @@ import utils
 
 
 class Eif():
-    def __init__(self, dyn_2d, model_sensor, dt, sig_v, sig_w, sig_r, sig_phi, M):
+    def __init__(self, dyn_2d, model_sensor, sig_accel, sig_gyro, sig_gps):
         self.dyn_2d = dyn_2d
         self.model_sensor = model_sensor
-        self.dt = dt
-        self.sig_v = sig_v
-        self.sig_w = sig_w
-        self.sig_r = sig_r
-        self.sig_phi = sig_phi
-        self.M = M
+        self.t_prev = 0
+        self.sig_accel = sig_accel
+        self.sig_gyro = sig_gyro
+        self.sig_gps = sig_gps
 
     def ext_info_filter(self, Ksp, Omp, Ut, Zt):
 
+        self.prediction(Ut, Omp, Ksp)
+        self.measure()
+
+    def prediction(self, Ut, Om, Ks):
         #prediction step
-        Mup = inv(Omp)@Ksp
-        # Mup[2] = utils.wrap(Mup[2]) #could be wrapped, but to match true theta, don't
-        thp = Mup[2]
-        Gt, Rt= self.propogation_matrices(Ut, thp)
-        Omg_bar = inv(Gt@inv(Omp)@Gt.T+Rt)
-        g_function = self.dyn_2d(Mup, Ut) #g is needed for both prediction and measurement
+        Mu = inv(Om)@Ks
+        Gt, Rt= self.propogation_matrices(Ut)
+        Omg_bar = inv(Gt@inv(Om)@Gt.T+Rt)
+        g_function = self.dyn_2d(Mu, Ut) #g is needed for both prediction and measurement
         Ks_bar = Omg_bar@g_function
 
+        Ks = Ks_bar
+        Omg = Omg_bar
+
+        return Ks, Omg
+
+    def measure(self):
         #measurement step for each marker
         mu_bar = g_function
         no_noise = 0
