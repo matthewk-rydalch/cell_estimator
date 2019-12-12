@@ -20,15 +20,23 @@ class Eif():
 
     def ext_info_filter(self, Ksp, Omp, Ut, Zt):
 
+        self.prediction(Ut, Omp, Ksp)
+        self.measure()
+
+    def prediction(self, Ut, Om, Ks):
         #prediction step
-        Mup = inv(Omp)@Ksp
-        # Mup[2] = utils.wrap(Mup[2]) #could be wrapped, but to match true theta, don't
-        thp = Mup[2]
-        Gt, Rt= self.propogation_matrices(Ut, thp)
-        Omg_bar = inv(Gt@inv(Omp)@Gt.T+Rt)
-        g_function = self.dyn_2d(Mup, Ut) #g is needed for both prediction and measurement
+        Mu = inv(Om)@Ks
+        Gt, Rt= self.propogation_matrices(Ut)
+        Omg_bar = inv(Gt@inv(Om)@Gt.T+Rt)
+        g_function = self.dyn_2d(Mu, Ut) #g is needed for both prediction and measurement
         Ks_bar = Omg_bar@g_function
 
+        Ks = Ks_bar
+        Omg = Omg_bar
+
+        return Ks, Omg
+
+    def measure(self):
         #measurement step for each marker
         mu_bar = g_function
         no_noise = 0

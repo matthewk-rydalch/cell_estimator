@@ -14,7 +14,8 @@ class Multirotor:
         self.sig_accel = sig_accel
         self.sig_gyro = sig_gyro
         self.sig_gps = sig_gps
-        self.t_prev = 0 #used to calculate dt
+        self.t_prev = 0 #this is updated in get_vel#used to calculate dt
+        self.vt = np.array([[0],[0],[0]]) #this needs to be remembered to calculate the next time step.  It is changed in get_vel
 
     def dyn_2d(self, Xp, Ut, time):
 
@@ -32,13 +33,13 @@ class Multirotor:
 
         return Xt
 
-    def get_vel(self, accel, time, noise = 1):
+    def get_vel(self, accel, omega, time, noise = 1):
 
-        a_t = accel[0]
-        alpha_t = accel[1]
-
-        self.v_t = a_t*dt+self.v_prev
-        self.omega_t = alpha_t*dt+self.omega_prev
+        dt = np.array([[time-self.t_prev]])
+        self.vt = self.vt + accel*dt
+        self.t_prev = time
+        # self.v_t = a_t*dt+self.v_prev
+        # self.omega_t = alpha_t*dt+self.omega_prev
 
         # epv = noise*np.random.normal(0, self.sig_v)
         # epw = noise*np.random.normal(0, self.sig_w)
@@ -46,7 +47,7 @@ class Multirotor:
         # vt = vc+epv
         # wt = wc+epw
 
-        Ut = np.array([vt, wt])
+        Ut = np.array([self.vt, omega])
 
         return Ut
 

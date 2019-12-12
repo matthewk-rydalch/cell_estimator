@@ -50,14 +50,26 @@ class Estimator():
         mr = Multirotor(sig_accel, sig_gyro, sig_gps)
         viz = Visualizer(xlim, ylim)
         eif = Eif(mr.dyn_2d, mr.model_sensor, sig_accel, sig_gyro, sig_gps)
+        self.mr = mr
+        self.viz = viz
+        self.eif = eif
 
         #convert to information form
-        Om = inv(Sig)
-        Ks = Om@Mu
+        self.Om = inv(Sig)
+        self.Ks = self.Om@Mu
 
     def imu_callback(self, data):
-        # Ut = get_vel(data, time)
-        # self.Ks, self.Om = propagate(Ut)
+        accel_x = data.linear_acceleration.x
+        accel_y = data.linear_acceleration.y
+        accel_z = data.linear_acceleration.z
+        accel = np.array([[accel_x],[accel_y],[accel_z]])
+        omega_x = data.angular_velocity.x
+        omega_y = data.angular_velocity.y
+        omega_z = data.angular_velocity.z
+        omega = np.array([[omega_x],[omega_y],[omega_z]])
+        time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
+        Ut = self.mr.get_vel(accel, omega, time)
+        self.Ks, self.Om = self.eif.prediction(Ut)
         printer('got imu')
 
     def ned_callback(self, data):
@@ -78,21 +90,6 @@ class Estimator():
         printer("rover_RelPos_callback \n")
 
     # def get_vel(self):
-
-    # def propagate(self, Ut):
-    #     #prediction step
-    #     Mup = inv(Omp)@Ksp
-    #     # Mup[2] = utils.wrap(Mup[2]) #could be wrapped, but to match true theta, don't
-    #     thp = Mup[2]
-    #     Gt, Rt= self.mr.propogation_matrices(Ut, thp)
-    #     Omg_bar = inv(Gt@inv(Omp)@Gt.T+Rt)
-    #     g_function = self.dyn_2d(Mup, Ut) #g is needed for both prediction and measurement
-    #     Ks_bar = Omg_bar@g_function
-
-    #     Ks = Ks_bar
-    #     Omg = Omg_bar
-
-    #     return Ks, Omg
 
     # def measurement(self, ned):
     #     #measurement step for each marker
