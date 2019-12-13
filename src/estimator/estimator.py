@@ -26,9 +26,10 @@ class Estimator():
         #parameters
         xlim = 30.0 #m
         ylim = 30.0 #m
-        sig_gps = 3 #m
-        sig_accel = 1 #m/s^2
-        sig_gyro = 1 #m^2/s^2
+        sig_gps = 4.0 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
+        sig_accel = 0.4 #m/s^2
+        sig_gyro = 1.0 #deg/s^2
+        sig_gyro = sig_gyro*np.pi/180 #rad/s^2
         N0 = 0.0 #m
         E0 = 0.0 #m
         th0 = 0.0 #rad
