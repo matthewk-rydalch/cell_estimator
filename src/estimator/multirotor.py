@@ -14,10 +14,9 @@ class Multirotor:
         self.sig_accel = sig_accel
         self.sig_gyro = sig_gyro
         self.sig_gps = sig_gps
-        self.t_prev = 0 #this is updated in get_vel#used to calculate dt
         self.vt = np.array([[0],[0],[0]]) #this needs to be remembered to calculate the next time step.  It is changed in get_vel
 
-    def dyn_2d(self, Xp, Ut, time):
+    def dyn_2d(self, Xp, Ut, dt):
 
         Np = Xp[0][0]
         Ep = Xp[1][0]
@@ -25,19 +24,18 @@ class Multirotor:
         vt = Ut[0]
         wt = Ut[1]
 
-        xt = xp+(vt*math.cos(thp))*self.dt
-        yt = yp+(vt*math.sin(thp))*self.dt
-        tht = thp+wt*self.dt
+        Nt = Np+(vt*math.cos(thp))*dt
+        Et = Ep+(vt*math.sin(thp))*dt
+        tht = thp+wt*dt
 
-        Xt = np.array([[xt], [yt], [tht]])
-
+        Xt = np.array([Nt, Et, tht])
         return Xt
 
-    def get_vel(self, accel, omega, time, noise = 1):
+    def get_vel(self, accel, omega, dt, noise = 1):
 
-        dt = np.array([[time-self.t_prev]])
         self.vt = self.vt + accel*dt
-        self.t_prev = time
+        vt_mag = np.sqrt(self.vt[0]**2+self.vt[1]**2)
+        om_mag = omega[2]
         # self.v_t = a_t*dt+self.v_prev
         # self.omega_t = alpha_t*dt+self.omega_prev
 
@@ -47,29 +45,12 @@ class Multirotor:
         # vt = vc+epv
         # wt = wc+epw
 
-        Ut = np.array([self.vt, omega])
+        Ut = np.array([vt_mag, om_mag])
 
         return Ut
 
     def model_sensor(self, Xt, noise = 1):
 
-        #states
-        xt = Xt[0,:]
-        yt = Xt[1,:]
-        tht = Xt[2,:]
+        zt = Xt
 
-        #range components w/o sensor noise
-        difx = self.M[0]-xt
-        dify = self.M[1]-yt
-
-        #range and bearing w/o sensor noise/truth
-        zr_tru = np.sqrt(difx**2+dify**2)
-        zb_tru = np.arctan2(dify,difx)
-
-        #add in sensor noise if noise is not specified as 0
-        zr = zr_tru + noise*np.random.normal(0, self.sig_r)
-        zb = utils.wrap(zb_tru - tht + noise*np.random.normal(0, self.sig_phi))
-
-        z = np.array([zr,zb])
-
-        return(z)
+        return(zt)

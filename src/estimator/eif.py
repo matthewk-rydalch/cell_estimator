@@ -10,9 +10,11 @@ import utils
 
 
 class Eif():
-    def __init__(self, dyn_2d, model_sensor, sig_accel, sig_gyro, sig_gps):
+    def __init__(self, dyn_2d, model_sensor, prediction_jacobian, measurement_jacobian, sig_accel, sig_gyro, sig_gps):
         self.dyn_2d = dyn_2d
         self.model_sensor = model_sensor
+        self.prediction_jacobian = prediction_jacobian
+        self.measurement_jacobian = measurement_jacobian
         self.t_prev = 0
         self.sig_accel = sig_accel
         self.sig_gyro = sig_gyro
@@ -23,66 +25,68 @@ class Eif():
         self.prediction(Ut, Omp, Ksp)
         self.measure()
 
-    def prediction(self, Ut, Om, Ks):
+    def prediction(self, Ut, Mu, Sig, dt):
+        #convert to information form
+        # set_trace()
+        Om = inv(Sig)
+        Ks = Om@Mu
+
         #prediction step
-        Mu = inv(Om)@Ks
-        Gt, Rt= self.propogation_matrices(Ut)
+        Gt= self.prediction_jacobian(Ut, Mu, dt)
+        Rt= self.propogation_matrices(Mu, dt)
         Omg_bar = inv(Gt@inv(Om)@Gt.T+Rt)
-        g_function = self.dyn_2d(Mu, Ut) #g is needed for both prediction and measurement
+        g_function = self.dyn_2d(Mu, Ut, dt) #g is needed for both prediction and measurement
         Ks_bar = Omg_bar@g_function
 
         Ks = Ks_bar
-        Omg = Omg_bar
+        Om = Omg_bar
 
-        return Ks, Omg
+        #convert back to Mu and Sig
+        Sig = inv(Om)
+        Mu = Sig@Ks
 
-    def measure(self):
-        #measurement step for each marker
-        mu_bar = g_function
-        no_noise = 0
-        h_function = self.model_sensor(mu_bar, no_noise)
-        for i in range(len(self.M[0])):
-            Ht, Qt = self.measurement_matrices(self.M[:,i], mu_bar)
-            #reassign Omg to Omg_bar until all markers are accounted for
-            Omg_bar = Omg_bar+Ht.T@inv(Qt)@Ht
-            #reassign Ks to Ks_bar until all markers are accounted for
-            Ks_bar = Ks_bar+Ht.T@inv(Qt)@(utils.wrap(np.array([Zt[:,i]]).T-np.array([h_function[:,i]]).T)+Ht@mu_bar)
+        return Mu, Sig
+
+    def measure(self, Mu_bar, Sig_bar, Zt):
+        #convert to information form
+        Om_bar = inv(Sig_bar)
+        Ks_bar = Om_bar@Mu_bar
+
+        Ht= self.measurement_jacobian(Mu_bar, Zt)
+        Qt = self.measurement_matrices()
+        #reassign Omg to Omg_bar until all markers are accounted for
+
+        Om_bar[0:2,0:2] = Om_bar[0:2,0:2]+Ht.T@inv(Qt)@Ht
+        #reassign Ks to Ks_bar until all markers are accounted for
+        # Ks_bar = Ks_bar+Ht.T@inv(Qt)@(utils.wrap(np.array([Zt]).T-np.array([h_function).T)+Ht@Mu_bar)
+        #h_function is equal to Zt so the difference is zero
+        Ks_bar[0:2] = Ks_bar[0:2]+Ht.T@inv(Qt)@(Ht@Mu_bar[0:2])
         Ks = Ks_bar
-        Omg = Omg_bar
+        Om = Om_bar
 
-        return Ks, Omg
+        #convert back to Mu and Sig
+        Sig = inv(Om)
+        Mu = Sig@Ks
 
-    def propogation_matrices(self, Ut, thp):
+        return Mu, Sig
 
-        vc = Ut[0]
-        wc = Ut[1]
-        Gt = np.squeeze(np.array([[1.0, 0.0, -vc*math.sin(thp)*self.dt],\
-                                  [0.0, 1.0, vc*math.cos(thp)*self.dt],\
-                                  [0.0, 0.0, 1.0]]))
+    def propogation_matrices(self, Mu, dt):
 
-        Vt = np.squeeze(np.array([[math.cos(thp)*self.dt, 0.0],\
-                                  [math.sin(thp)*self.dt, 0.0],\
-                                  [0.0, self.dt]]))
+        thp = Mu[2]
 
-        Mt = np.array([[self.sig_v**2, 0.0],\
-                       [0.0, self.sig_w**2]])
+        Vt = np.squeeze(np.array([[math.cos(thp)*dt, 0.0],\
+                                  [math.sin(thp)*dt, 0.0],\
+                                  [0.0, dt]]))
 
+        Mt = np.array([[self.sig_accel**2, 0.0],\
+                       [0.0, self.sig_gyro**2]])
         Rt = Vt@Mt@Vt.T
 
-        return Gt, Rt
+        return Rt
 
-    def measurement_matrices(self, m, mu_bar):
-        mx = m[0]
-        my = m[1]
-        mub_x = mu_bar[0][0]
-        mub_y = mu_bar[1][0]
-        mub_th = mu_bar[2][0]
+    def measurement_matrices(self):
 
-        q = (mx-mub_x)**2+(my-mub_y)**2
-        Ht = np.array([[(mub_x-mx)/math.sqrt(q), (mub_y-my)/math.sqrt(q), 0.0],\
-                       [(my-mub_y)/q, (mub_x-mx)/q, -1.0]])
+        Qt = np.array([[self.sig_gps**2, 0.0],\
+                       [0.0, self.sig_gps**2]])
 
-        Qt = np.array([[self.sig_r**2, 0.0],\
-                       [0.0, self.sig_phi**2]])
-
-        return Ht, Qt
+        return Qt

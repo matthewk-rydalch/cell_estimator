@@ -3,6 +3,8 @@ import numpy as np
 from importlib import reload, import_module
 import math
 from numpy.linalg import inv
+from IPython.core.debugger import set_trace
+
 
 multirotor = reload(import_module("multirotor"))
 from multirotor import Multirotor
@@ -33,13 +35,16 @@ class Estimator():
         # sig_w = 0.1 #rad/s
         N0 = 0.0 #m
         E0 = 0.0 #m
+        th0 = 0.0 #rad
         #alitude does not change
+        self.t_prev_imu = 0 #this is updated in imu callback #used to calculate dt
 
     	#my specified parameters and variables
-        Sig = np.array([[1.0, 0.0],
-                        [0.0, 1.0]])
+        self.Sig = np.array([[1.0, 0.0, 0.0],
+                        [0.0, 1.0, 0.0],
+                        [0.0, 0.0, 1.0]])
 
-        Mu = np.array([[N0],[E0]])
+        self.Mu = np.array([[N0],[E0],[th0]])
 
         Sig_hist = []
         Mu_hist = []
@@ -49,14 +54,10 @@ class Estimator():
         #instantiate classes
         mr = Multirotor(sig_accel, sig_gyro, sig_gps)
         viz = Visualizer(xlim, ylim)
-        eif = Eif(mr.dyn_2d, mr.model_sensor, sig_accel, sig_gyro, sig_gps)
+        Filter = Eif(mr.dyn_2d, mr.model_sensor, self.prediction_jacobians, self.measurement_jacobians, sig_accel, sig_gyro, sig_gps)
         self.mr = mr
         self.viz = viz
-        self.eif = eif
-
-        #convert to information form
-        self.Om = inv(Sig)
-        self.Ks = self.Om@Mu
+        self.Filter = Filter
 
     def imu_callback(self, data):
         accel_x = data.linear_acceleration.x
@@ -68,16 +69,16 @@ class Estimator():
         omega_z = data.angular_velocity.z
         omega = np.array([[omega_x],[omega_y],[omega_z]])
         time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
-        Ut = self.mr.get_vel(accel, omega, time)
-        self.Ks, self.Om = self.eif.prediction(Ut)
+        dt = time-self.t_prev_imu
+        Ut = self.mr.get_vel(accel, omega, dt)
+        self.Mu, self.Sig = self.Filter.prediction(Ut, self.Mu, self.Sig, dt)
         printer('got imu')
 
     def ned_callback(self, data):
-        # ned = np.zeros((3,1))
-        # ned[0] = NED_data.relPosNED[0]
-        # ned[1] = NED_data.relPosNED[1]
-        # ned[2] = NED_data.relPosNED[2]
-        # self.Ks, self.Om = measurement(ned)
+        Zt = np.zeros((2,1))
+        Zt[0] = data.relPosNED[0]
+        Zt[1] = data.relPosNED[1]
+        self.Mu, self.Sig = self.Filter.measure(self.Mu, self.Sig, Zt)
         printer('got ned')
 
     def lla_callback(self, data):
@@ -106,3 +107,21 @@ class Estimator():
     #     Omg = Omg_bar
 
     #     return Ks, Omg
+
+    def prediction_jacobians(self, Ut, Mu, dt):
+
+        vt = Ut[0]
+        thp = Mu[2]
+        jacob13 = -vt*math.sin(thp)*dt
+        jacob12 = vt*math.cos(thp)*dt
+        Gt = np.squeeze(np.array([[1.0, 0.0, jacob13[0]],\
+                                [0.0, 1.0, jacob12[0]],\
+                                [0.0, 0.0, 1.0]]))
+        return Gt
+
+    def measurement_jacobians(self, Mu_bar, Zt):
+        #our model is linear
+        Ht = np.array([[1.0, 0.0],\
+                       [0.0, 1.0]])
+
+        return Ht
