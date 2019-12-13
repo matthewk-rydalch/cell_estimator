@@ -12,7 +12,6 @@ visualizer = reload(import_module("visualizer"))
 from visualizer import Visualizer
 eif = reload(import_module("eif"))
 from eif import Eif
-utils = reload(import_module("utils"))
 
 
 DEBUG = False
@@ -43,10 +42,11 @@ class Estimator():
 
         self.Mu = np.array([[N0],[E0],[th0]])
 
-        Sig_hist = []
-        Mu_hist = []
-        Ks_hist = []
-        Z_hist = []
+        self.Sig_hist = []
+        self.Mu_hist = []
+        self.cell_time_hist = []
+        self.rover_time_hist = []
+        self.rover_pos_hist = []
 
         #instantiate classes
         cart = Cart(sig_accel, sig_gyro, sig_gps)
@@ -74,6 +74,9 @@ class Estimator():
         self.t_prev_imu = time
         Ut = self.cart.get_vel(accel, omega, dt)
         self.Mu, self.Sig = self.Filter.prediction(Ut, self.Mu, self.Sig, dt)
+        self.Mu_hist.append(self.Mu)
+        self.Sig_hist.append(self.Sig)
+        self.cell_time_hist.append(time)
         #visualization()
         printer('got imu')
 
@@ -81,9 +84,14 @@ class Estimator():
         Zt = np.zeros((2,1))
         Zt[0] = data.relPosNED[0]
         Zt[1] = data.relPosNED[1]
+        time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
         # print('sigma = ', self.Sig)
-        # self.Mu, self.Sig = self.Filter.measure(self.Mu, self.Sig, Zt)
+        self.Mu, self.Sig = self.Filter.measure(self.Mu, self.Sig, Zt)
         # print('sigma post= ', self.Sig)
+        self.Mu_hist.append(self.Mu)
+        self.Sig_hist.append(self.Sig)
+        self.cell_time_hist.append(time)
+
         printer('got ned')
 
     def lla_callback(self, data):
@@ -92,6 +100,12 @@ class Estimator():
         printer('got lla')
 
     def rover_RelPos_callback(self, data):
+        time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
+        self.rover_time_hist.append(time)
+        Pt = [0]*2
+        Pt[0] = data.relPosNED[0]
+        Pt[1] = data.relPosNED[1]
+        self.rover_pos_hist.append(Pt)
         #this line is simply to verify that messages are being subscribed to during development
         printer("rover_RelPos_callback \n")
 
