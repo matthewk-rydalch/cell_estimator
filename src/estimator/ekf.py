@@ -9,7 +9,7 @@ from IPython.core.debugger import set_trace
 import utils
 
 class Ekf():
-    def __init__(self, dyn_2d, model_sensor, prediction_jacobian, measurement_jacobian, sig_accel, sig_gyro, sig_gps):
+    def __init__(self, dyn_2d, model_sensor, prediction_jacobian, measurement_jacobian, sig_accel, sig_gyro, sig_gps, sig_gps_heading):
         self.dyn_2d = dyn_2d
         self.model_sensor = model_sensor
         self.prediction_jacobian = prediction_jacobian
@@ -20,6 +20,7 @@ class Ekf():
         self.sig_accel = sig_accel
         self.sig_gyro = sig_gyro
         self.sig_gps = sig_gps
+        self.sig_gps_heading = sig_gps_heading
 
     #this function is only used if using a driver that doesn't seperate prediction and measurement steps
     def ext_info_filter(self, Ksp, Omp, Ut, Zt):
@@ -45,7 +46,7 @@ class Ekf():
             self.zt_prev[2] = -np.pi/2
             self.first = False
         Zt[2]=utils.wrap(np.arctan2(Zt[0]-self.zt_prev[0],Zt[1]-self.zt_prev[1])-np.pi/2)
-        print('Zt = ', Zt)
+        # print('Zt = ', Zt)
         self.zt_prev = Zt
         Qt = self.measurement_matrices()
         St = Ht@Sig_bar@Ht.T+Qt
@@ -78,6 +79,6 @@ class Ekf():
 
         # Qt = np.array([[self.sig_gps**2, 0.0],\
         #                [0.0, self.sig_gps**2]])
-        Qt = np.diag([self.sig_gps**2, self.sig_gps**2, self.sig_gps**2])
+        Qt = np.diag([self.sig_gps**2, self.sig_gps**2, self.sig_gps_heading**2])
 
         return Qt

@@ -5,6 +5,7 @@ from importlib import reload, import_module
 import math
 from numpy.linalg import inv
 from IPython.core.debugger import set_trace
+import val
 
 
 cart = reload(import_module("cart"))
@@ -16,9 +17,9 @@ from ekf import Ekf
 
 
 DEBUG = False
-def printer(statement):
+def printer(statement, statement2=''):
     if DEBUG:
-        printer(statement)
+        printer(statement, statement2)
 
 class Estimator():
     def __init__(self):
@@ -26,10 +27,11 @@ class Estimator():
         #parameters
         xlim = 30.0 #m
         ylim = 30.0 #m
-        sig_gps = 0.5 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
+        sig_gps = 0.1 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
+        sig_gps_heading = 1.0 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
         sig_accel = 1.0#0.4 #m/s^2
-        sig_gyro = 1.0#1.0 #deg/s^2
-        sig_gyro = sig_gyro*np.pi/180 #rad/s^2
+        sig_gyro = 1.0 * val.d2r#1.0 #deg/s^2
+        # sig_gyro = sig_gyro*np.pi/180 #rad/s^2
         N0 = 0.0 #m
         E0 = 0.0 #m
         self.th0 = -np.pi/2 #rad
@@ -55,7 +57,7 @@ class Estimator():
         #instantiate classes
         cart = Cart(sig_accel, sig_gyro, sig_gps)
         viz = Visualizer(xlim, ylim)
-        Filter = Ekf(cart.dyn_2d, cart.model_sensor, self.prediction_jacobians, self.measurement_jacobians, sig_accel, sig_gyro, sig_gps)
+        Filter = Ekf(cart.dyn_2d, cart.model_sensor, self.prediction_jacobians, self.measurement_jacobians, sig_accel, sig_gyro, sig_gps, sig_gps_heading)
         self.cart = cart
         self.viz = viz
         self.Filter = Filter
@@ -74,6 +76,13 @@ class Estimator():
         omega_y = data.angular_velocity.y
         omega_z = -data.angular_velocity.z
         omega = np.array([[omega_x],[omega_y],[omega_z]])
+        if np.abs(omega_z)>0.05:
+            self.Filter.sig_gyro = 1.0 * val.d2r
+            self.Filter.sig_gps_heading = 15.0
+            print("omega:", omega)
+        else:
+            self.Filter.sig_gyro = 10.0 * val.d2r
+            self.Filter.sig_gps_heading = 0.5
         # set_trace()
         time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
         if self.prop_first:
@@ -105,9 +114,9 @@ class Estimator():
             self.Mu = Zt
             self.mu_first = False
         time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
-        print("MU measurement before:", self.Mu)
+        printer("MU measurement before:", self.Mu)
         self.Mu, self.Sig = self.Filter.measure(self.Mu, self.Sig, Zt)
-        print("MU measurement after:", self.Mu)
+        printer("MU measurement after:", self.Mu)
         self.Mu_hist.append(self.Mu)
         self.Sig_hist.append(self.Sig)
         self.cell_time_hist.append(time)
@@ -154,4 +163,3 @@ class Estimator():
         MU.relPosNED[1] = self.Mu[1]
         MU.relPosNED[2] = self.Mu[2]
         self.pub_Mu.publish(MU)
-
