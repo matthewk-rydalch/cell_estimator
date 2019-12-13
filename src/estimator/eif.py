@@ -35,7 +35,7 @@ class Eif():
         #prediction step
         Gt= self.prediction_jacobian(Ut, Mu, dt)
         Rt= self.propogation_matrices(Mu, dt)
-        Omg_bar = inv(Gt@inv(Om)@Gt.T+Rt)
+        Omg_bar = inv(Gt@Sig@Gt.T+Rt)
         g_function = self.dyn_2d(Mu, Ut, dt)
         Ks_bar = Omg_bar@g_function
 

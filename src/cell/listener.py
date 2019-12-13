@@ -180,7 +180,7 @@ class udp_receiver():
             NED_data.relPosNED[2] = ned[2]
             NED_data.header.stamp = time
             printer("NED = ", NED_data)
-            print("ned = ", ned)
+            printer("ned = ", ned)
             self.pub_NED.publish(NED_data)
 
 

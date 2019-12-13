@@ -38,8 +38,8 @@ class Estimator():
 
     	#my specified parameters and variables
         self.Sig = np.array([[1.0, 0.0, 0.0],
-                        [0.0, 1.0, 0.0],
-                        [0.0, 0.0, 1.0]])
+                            [0.0, 1.0, 0.0],
+                            [0.0, 0.0, 1.0]])
 
         self.Mu = np.array([[N0],[E0],[th0]])
 
@@ -65,17 +65,25 @@ class Estimator():
         omega_y = data.angular_velocity.y
         omega_z = data.angular_velocity.z
         omega = np.array([[omega_x],[omega_y],[omega_z]])
+        # set_trace()
         time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
-        dt = time-self.t_prev_imu
+        if self.t_prev_imu != 0.0:
+            dt = time-self.t_prev_imu
+        else:
+            dt = 0.003
+        self.t_prev_imu = time
         Ut = self.cart.get_vel(accel, omega, dt)
         self.Mu, self.Sig = self.Filter.prediction(Ut, self.Mu, self.Sig, dt)
+        #visualization()
         printer('got imu')
 
     def ned_callback(self, data):
         Zt = np.zeros((2,1))
         Zt[0] = data.relPosNED[0]
         Zt[1] = data.relPosNED[1]
-        self.Mu, self.Sig = self.Filter.measure(self.Mu, self.Sig, Zt)
+        # print('sigma = ', self.Sig)
+        # self.Mu, self.Sig = self.Filter.measure(self.Mu, self.Sig, Zt)
+        # print('sigma post= ', self.Sig)
         printer('got ned')
 
     def lla_callback(self, data):
