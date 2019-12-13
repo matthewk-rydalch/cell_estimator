@@ -57,7 +57,7 @@ class Eif():
         Qt = self.measurement_matrices()
         #reassign Om to Om_bar until all markers are accounted for
         Om_bar[0:2,0:2] = Om_bar[0:2,0:2]+Ht.T@inv(Qt)@Ht
-        Ks_bar[0:2] = Ks_bar[0:2]+Ht.T@inv(Qt)@(Ht@Mu_bar[0:2])
+        Ks_bar[0:2] = Ks_bar[0:2]+Ht.T@inv(Qt)@(Zt-Mu_bar[0:2]+Ht@Mu_bar[0:2])
         Ks = Ks_bar
         Om = Om_bar
 

@@ -26,7 +26,7 @@ class Estimator():
         #parameters
         xlim = 30.0 #m
         ylim = 30.0 #m
-        sig_gps = 4.0 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
+        sig_gps = 1.0E-50 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
         sig_accel = 0.4 #m/s^2
         sig_gyro = 1.0 #deg/s^2
         sig_gyro = sig_gyro*np.pi/180 #rad/s^2
@@ -79,16 +79,12 @@ class Estimator():
             dt = 0.003
         self.t_prev_imu = time
         Ut = self.cart.get_vel(accel, omega, dt)
-        self.Mu, self.Sig = self.Filter.prediction(Ut, self.Mu, self.Sig, dt)
+        # self.Mu, self.Sig = self.Filter.prediction(Ut, self.Mu, self.Sig, dt)
         self.Mu_hist.append(self.Mu)
         self.Sig_hist.append(self.Sig)
         self.cell_time_hist.append(time)
         # print("MU propagation:", self.Mu)
-        MU = RelPos()
-        MU.relPosNED[0] = self.Mu[0]
-        MU.relPosNED[1] = self.Mu[1]
-        MU.relPosNED[2] = self.Mu[2]
-        self.pub_Mu.publish(MU)
+        # self.mu_publisher()
         #visualization()
         printer('got imu')
 
@@ -104,7 +100,7 @@ class Estimator():
         self.Mu_hist.append(self.Mu)
         self.Sig_hist.append(self.Sig)
         self.cell_time_hist.append(time)
-
+        self.mu_publisher()
         printer('got ned')
 
     def lla_callback(self, data):
@@ -139,3 +135,11 @@ class Estimator():
                        [0.0, 1.0]])
 
         return Ht
+
+    def mu_publisher(self):
+        MU = RelPos()
+        MU.relPosNED[0] = self.Mu[0]
+        MU.relPosNED[1] = self.Mu[1]
+        MU.relPosNED[2] = self.Mu[2]
+        self.pub_Mu.publish(MU)
+
