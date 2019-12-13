@@ -56,6 +56,9 @@ class Estimator():
         self.viz = viz
         self.Filter = Filter
 
+        # ROS stuff (sorry I did't want to try and figure out a better way to do this)
+        # self.pub_Mu = rospy.Publisher('Mu', RelPos, queue_size=1024)
+
     def imu_callback(self, data):
         accel_x = data.linear_acceleration.x
         accel_y = data.linear_acceleration.y
@@ -74,6 +77,7 @@ class Estimator():
         self.t_prev_imu = time
         Ut = self.cart.get_vel(accel, omega, dt)
         self.Mu, self.Sig = self.Filter.prediction(Ut, self.Mu, self.Sig, dt)
+        # self.pub_Mu.publish()
         #visualization()
         printer('got imu')
 
@@ -82,7 +86,7 @@ class Estimator():
         Zt[0] = data.relPosNED[0]
         Zt[1] = data.relPosNED[1]
         # print('sigma = ', self.Sig)
-        # self.Mu, self.Sig = self.Filter.measure(self.Mu, self.Sig, Zt)
+        self.Mu, self.Sig = self.Filter.measure(self.Mu, self.Sig, Zt)
         # print('sigma post= ', self.Sig)
         printer('got ned')
 
