@@ -1,0 +1,4 @@
+%time,field.header.seq,field.header.stamp,field.header.frame_id,field.level,field.name,field.msg,field.file,field.function,field.line
+1576083243936139279,4,1576083243932381666,,2,/record_1576083243899995408,Subscribing to /rosout,/tmp/binarydeb/ros-melodic-rosbag-1.14.3/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,210
+1576083243936167413,5,1576083243934401808,,2,/record_1576083243899995408,Subscribing to /rosout_agg,/tmp/binarydeb/ros-melodic-rosbag-1.14.3/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,210
+1576083299727650531,1,1576083299727311611,,4,/cell_ros_30087_1576083212340,Inbound TCP/IP connection failed: connection from sender terminated before handshake header received. 0 bytes were received. Please check sender for additional details.,tcpros_base.py,TCPROSServer._tcp_server_callback,352,/lla,/base/lla,/rosout,/imu,/NED

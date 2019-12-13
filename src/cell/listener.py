@@ -116,41 +116,29 @@ class udp_receiver():
         self.base_lat = msg.lla[0]*val.d2r
         self.base_lon = msg.lla[1]*val.d2r
         self.base_alt = msg.lla[2]
+        self.chi = np.sqrt( 1 - val.e_frst_num_ecc * np.sin(self.base_lat) * np.sin(self.base_lat) )
+        self.xr = ( val.e_smaj / self.chi + self.base_alt ) * np.cos(self.base_lat) * np.cos(self.base_lon)
+        self.yr = ( val.e_smaj / self.chi + self.base_alt ) * np.cos(self.base_lat) * np.sin(self.base_lon)
+        self.zr = ( val.e_smaj * (1 - val.e_frst_num_ecc) / self.chi + self.base_alt ) * np.sin(self.base_lat)
+
         self.BASE_FOUND = True
 
     def GPS2NED(self, lat, lon, alt):
-        lat_deg = lat # Latitude
-        lon_deg = lon # Longitude
-        alt = alt # Altitude
+        lon_deg = lon   # Longitude
+        lat_deg = lat     # Latitude
+        alt = alt         # Altitude
 
         #send in lon (lambda, or longitude) as an angle in degrees North ex. 76.42816
         #send in lat (phi, or latitude) as an angle in degrees East ex.38.14626
         #both of those are converted into radians
         #send in alt as a altitude (mean sea level) provo = about 1500
 
-        # lon_ref <-- rLam is the reference longitude (in RADIANS)
-        # lat_ref <-- rPhi is the reference latitude (in RADIANS)
+        # self.base_lon <-- rLam is the reference longitude (in RADIANS)
+        # self.base_lat <-- rPhi is the reference latitude (in RADIANS)
         # The reference angles define where the 0,0,0 point is in the local NED coordinates
-    	# Keep track of the origin
-
-        # reference longitude and latitude
-        # lon_ref = -origin[0] * val.d2r    # lon <-- rLam
-        # lat_ref = origin[1] * val.d2r     # lat <-- rPhi
-        # r_h = origin[2]                        # range --> height? ... or radar height?
-        lat_ref = self.base_lat * val.d2r
-        lon_ref = -self.base_lon * val.d2r
-        r_h = self.base_alt
-
-        # Convert the angles into Earth Centered Earth Fixed Reference Frame
-
-        # TO DO : check if x and y are correct
-        chi = np.sqrt( 1 - val.e_frst_num_ecc * np.sin(lat_ref) * np.sin(lat_ref) )
-        xr = ( val.e_smaj / chi + r_h ) * np.cos(lat_ref) * np.cos(lon_ref)
-        yr = ( val.e_smaj / chi + r_h ) * np.cos(lat_ref) * np.sin(lon_ref)
-        zr = ( val.e_smaj * (1 - val.e_frst_num_ecc) / chi + r_h ) * np.sin(lat_ref)
 
 
-        chi = np.sqrt(1 - val.e_frst_num_ecc * np.sin(lat_ref)**2 )
+        chi = np.sqrt(1 - val.e_frst_num_ecc * np.sin(self.base_lat)**2 )
 
         #Convert the incoming angles to radians
         lon = lon_deg * val.d2r         # typical longitude greek is lambda
@@ -162,15 +150,14 @@ class udp_receiver():
         z = ( val.e_smaj * (1 - val.e_frst_num_ecc) / chi + alt) * np.sin(lat)
 
         # Find the difference between the point x, y, z to the reference point in ECEF
-        dx = x - xr
-        dy = y - yr
-        dz = z - zr
+        dx = x - self.xr
+        dy = y - self.yr
+        dz = z - self.zr
 
-        ned = []
         # Rotate the point in ECEF to the Local NED
-        N = (-np.sin(lat_ref)*np.cos(lon_ref)*dx) + (-np.sin(lat_ref)*np.sin(lon_ref)*dy) + np.cos(lat_ref)*dz
-        E = (np.sin(lon_ref)*dx) - (np.cos(lon_ref)*dy)
-        D = (-np.cos(lat_ref)*np.cos(lon_ref)*dx) + (-np.cos(lat_ref)*np.sin(lon_ref)*dy) + (-np.sin(lat_ref)*dz)
+        N = (-np.sin(self.base_lat)*np.cos(self.base_lon)*dx) + (-np.sin(self.base_lat)*np.sin(self.base_lon)*dy) + np.cos(self.base_lat)*dz
+        E = (np.sin(self.base_lon)*dx) - (np.cos(self.base_lon)*dy)
+        D = (-np.cos(self.base_lat)*np.cos(self.base_lon)*dx) + (-np.cos(self.base_lat)*np.sin(self.base_lon)*dy) + (-np.sin(self.base_lat)*dz)
 
         ned = np.array([N,E,D])
         return ned
@@ -193,10 +180,10 @@ class udp_receiver():
             NED_data.relPosNED[2] = ned[2]
             NED_data.header.stamp = time
             printer("NED = ", NED_data)
-            printer("ned = ", ned)
+            print("ned = ", ned)
             self.pub_NED.publish(NED_data)
 
-        
+
 
 if __name__ == '__main__':
     receiver = udp_receiver()

@@ -1,0 +1,2 @@
+%time,field.header.seq,field.header.stamp,field.header.frame_id,field.level,field.name,field.msg,field.file,field.function,field.line
+1564693578316881028,18,1564693578311112809,,8,/base/record,poll failed with error Interrupted system call,/tmp/binarydeb/ros-melodic-roscpp-1.14.3/src/libros/poll_set.cpp,PollSet::update,194

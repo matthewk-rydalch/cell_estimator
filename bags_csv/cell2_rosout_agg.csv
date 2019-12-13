@@ -1,0 +1,2 @@
+%time,field.header.seq,field.header.stamp,field.header.frame_id,field.level,field.name,field.msg,field.file,field.function,field.line,field.topics0,field.topics1,field.topics2,field.topics3,field.topics4
+1576083202341449441,5,1576083202340660810,,4,/cell_ros_29912_1576083060081,Inbound TCP/IP connection failed: connection from sender terminated before handshake header received. 0 bytes were received. Please check sender for additional details.,tcpros_base.py,TCPROSServer._tcp_server_callback,352,/imu,/rosout,/base/lla,/NED,/lla

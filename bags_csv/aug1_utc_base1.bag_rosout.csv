@@ -1,0 +1,8 @@
+%time,field.header.seq,field.header.stamp,field.header.frame_id,field.level,field.name,field.msg,field.file,field.function,field.line
+1564692202700614282,4,1564692202690912596,,2,/base/record,Subscribing to /rosout,/tmp/binarydeb/ros-melodic-rosbag-1.14.3/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,210
+1564692202700634700,5,1564692202692503471,,2,/base/record,Subscribing to /base/RelPos,/tmp/binarydeb/ros-melodic-rosbag-1.14.3/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,210
+1564692202700947023,6,1564692202694070836,,2,/base/record,Subscribing to /rosout_agg,/tmp/binarydeb/ros-melodic-rosbag-1.14.3/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,210
+1564692202700951977,7,1564692202695609090,,2,/base/record,Subscribing to /base/Obs,/tmp/binarydeb/ros-melodic-rosbag-1.14.3/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,210
+1564692202700958498,8,1564692202697153112,,2,/base/record,Subscribing to /base/PosVelTime,/tmp/binarydeb/ros-melodic-rosbag-1.14.3/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,210
+1564692202700961746,9,1564692202698906078,,2,/base/record,Subscribing to /base/GlonassEphemeris,/tmp/binarydeb/ros-melodic-rosbag-1.14.3/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,210
+1564693578312359964,10,1564693578311112809,,8,/base/record,poll failed with error Interrupted system call,/tmp/binarydeb/ros-melodic-roscpp-1.14.3/src/libros/poll_set.cpp,PollSet::update,194
