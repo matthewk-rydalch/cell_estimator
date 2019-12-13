@@ -50,8 +50,8 @@ class Estimator():
         #instantiate classes
         cart = Cart(sig_accel, sig_gyro, sig_gps)
         viz = Visualizer(xlim, ylim)
-        Filter = Eif(mr.dyn_2d, mr.model_sensor, self.prediction_jacobians, self.measurement_jacobians, sig_accel, sig_gyro, sig_gps)
-        self.mr = mr
+        Filter = Eif(cart.dyn_2d, cart.model_sensor, self.prediction_jacobians, self.measurement_jacobians, sig_accel, sig_gyro, sig_gps)
+        self.cart = cart
         self.viz = viz
         self.Filter = Filter
 
@@ -66,7 +66,7 @@ class Estimator():
         omega = np.array([[omega_x],[omega_y],[omega_z]])
         time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
         dt = time-self.t_prev_imu
-        Ut = self.mr.get_vel(accel, omega, dt)
+        Ut = self.cart.get_vel(accel, omega, dt)
         self.Mu, self.Sig = self.Filter.prediction(Ut, self.Mu, self.Sig, dt)
         printer('got imu')
 

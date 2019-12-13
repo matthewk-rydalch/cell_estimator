@@ -113,8 +113,8 @@ class udp_receiver():
         printer("Done reading.", self.BASE_FOUND)
 
     def base_lla_callback(self, msg):
-        self.base_lat = msg.lla[0]
-        self.base_lon = msg.lla[1]
+        self.base_lat = msg.lla[0]*val.d2r
+        self.base_lon = msg.lla[1]*val.d2r
         self.base_alt = msg.lla[2]
         self.BASE_FOUND = True
 

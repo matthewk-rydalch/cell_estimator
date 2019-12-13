@@ -55,8 +55,7 @@ class Eif():
 
         Ht= self.measurement_jacobian(Mu_bar, Zt)
         Qt = self.measurement_matrices()
-        #reassign Omg to Omg_bar until all markers are accounted for
-
+        #reassign Om to Om_bar until all markers are accounted for
         Om_bar[0:2,0:2] = Om_bar[0:2,0:2]+Ht.T@inv(Qt)@Ht
         Ks_bar[0:2] = Ks_bar[0:2]+Ht.T@inv(Qt)@(Ht@Mu_bar[0:2])
         Ks = Ks_bar
