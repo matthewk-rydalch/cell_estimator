@@ -37,12 +37,14 @@ class plotter():
         self.ned_y = []
         self.Mu_x = []
         self.Mu_y = []
+        self.rover_x = []
+        self.rover_y = []
 
         # Define the limits for the plot
-        self.xmin = -100#self.param['plotter_xmin']
-        self.xmax = 100#self.param['plotter_xmax']
-        self.ymin = -100#self.param['plotter_ymin']
-        self.ymax = 100#self.param['plotter_ymax']
+        self.xmin = -30#self.param['plotter_xmin']
+        self.xmax = 10#self.param['plotter_xmax']
+        self.ymin = -30#self.param['plotter_ymin']
+        self.ymax = 10#self.param['plotter_ymax']
 
         # Make the figure and axis for animation
         self.plot_update_interval = 100#self.param['plot_update_interval']
@@ -53,6 +55,8 @@ class plotter():
         # Define our subscribers
         rospy.Subscriber('NED', RelPos, self.ned_callback, queue_size=10)
         rospy.Subscriber('Mu', RelPos, self.Mu_callback, queue_size=10)
+        rospy.Subscriber('/rover/RelPos', RelPos, self.rover_callback, queue_size=10)
+        
 
         # Start the Plotting
         plt.show()
@@ -69,8 +73,10 @@ class plotter():
         if self.history == False:
             self.ax1.clear()
 
-        self.ax1.plot(self.ned_x, self.ned_y, 'r*')
+        self.ax1.plot(self.ned_x, self.ned_y, 'r.')
         self.ax1.plot(self.Mu_x, self.Mu_y, 'b.')
+        self.ax1.plot(self.rover_x, self.rover_y, 'g.')
+        
         ############################################################################
         # Stuff for plotting ellipses
         if self.Plot_Ellipses:
@@ -92,6 +98,11 @@ class plotter():
     def Mu_callback(self, msg):
         self.Mu_y = msg.relPosNED[0]
         self.Mu_x = msg.relPosNED[1]
+
+    def rover_callback(self, msg):
+        self.rover_y = msg.relPosNED[0]
+        self.rover_x = msg.relPosNED[1]
+
 
 if __name__ == '__main__':
     rospy.init_node('plotter', anonymous=True)

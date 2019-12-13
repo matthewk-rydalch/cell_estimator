@@ -34,7 +34,8 @@ class Cart:
     def get_vel(self, accel, omega, dt, noise = 1):
 
         self.vt = self.vt + accel*dt
-        vt_mag = np.sqrt(self.vt[0]**2+self.vt[1]**2)
+        vt_mag = self.vt[0]/3.0
+        # vt_mag = np.sqrt(self.vt[0]**2+self.vt[1]**2)/3.0
         om_mag = omega[2]
         Ut = np.array([vt_mag, om_mag])
 

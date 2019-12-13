@@ -11,8 +11,8 @@ cart = reload(import_module("cart"))
 from cart import Cart
 visualizer = reload(import_module("visualizer"))
 from visualizer import Visualizer
-eif = reload(import_module("eif"))
-from eif import Eif
+ekf = reload(import_module("ekf"))
+from ekf import Ekf
 
 
 DEBUG = False
@@ -26,13 +26,13 @@ class Estimator():
         #parameters
         xlim = 30.0 #m
         ylim = 30.0 #m
-        sig_gps = 1.0E-50 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
+        sig_gps = 3.0 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
         sig_accel = 0.4 #m/s^2
         sig_gyro = 1.0 #deg/s^2
         sig_gyro = sig_gyro*np.pi/180 #rad/s^2
         N0 = 0.0 #m
         E0 = 0.0 #m
-        th0 = 0.0 #rad
+        th0 = -np.pi/2 #rad
         #alitude does not change
         self.t_prev_imu = 0 #this is updated in imu callback #used to calculate dt
 
@@ -52,7 +52,7 @@ class Estimator():
         #instantiate classes
         cart = Cart(sig_accel, sig_gyro, sig_gps)
         viz = Visualizer(xlim, ylim)
-        Filter = Eif(cart.dyn_2d, cart.model_sensor, self.prediction_jacobians, self.measurement_jacobians, sig_accel, sig_gyro, sig_gps)
+        Filter = Ekf(cart.dyn_2d, cart.model_sensor, self.prediction_jacobians, self.measurement_jacobians, sig_accel, sig_gyro, sig_gps)
         self.cart = cart
         self.viz = viz
         self.Filter = Filter
@@ -69,22 +69,22 @@ class Estimator():
         accel = np.array([[accel_x],[accel_y],[accel_z]])
         omega_x = data.angular_velocity.x
         omega_y = data.angular_velocity.y
-        omega_z = data.angular_velocity.z
+        omega_z = -data.angular_velocity.z
         omega = np.array([[omega_x],[omega_y],[omega_z]])
         # set_trace()
         time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
         if self.t_prev_imu != 0.0:
-            dt = time-self.t_prev_imu
+            dt = (time-self.t_prev_imu)
         else:
             dt = 0.003
         self.t_prev_imu = time
         Ut = self.cart.get_vel(accel, omega, dt)
-        # self.Mu, self.Sig = self.Filter.prediction(Ut, self.Mu, self.Sig, dt)
+        self.Mu, self.Sig = self.Filter.prediction(Ut, self.Mu, self.Sig, dt)
         self.Mu_hist.append(self.Mu)
         self.Sig_hist.append(self.Sig)
         self.cell_time_hist.append(time)
         # print("MU propagation:", self.Mu)
-        # self.mu_publisher()
+        self.mu_publisher()
         #visualization()
         printer('got imu')
 
@@ -95,7 +95,7 @@ class Estimator():
         time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
         # print('sigma = ', self.Sig)
         self.Mu, self.Sig = self.Filter.measure(self.Mu, self.Sig, Zt)
-        print("MU measurement:", self.Mu)
+        # print("MU measurement:", self.Mu)
         # print('sigma post= ', self.Sig)
         self.Mu_hist.append(self.Mu)
         self.Sig_hist.append(self.Sig)
