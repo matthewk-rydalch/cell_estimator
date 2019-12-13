@@ -133,10 +133,10 @@ class Estimator():
 
         vt = Ut[0]
         thp = Mu[2]
-        jacob13 = -vt*math.sin(thp)*dt
-        jacob12 = vt*math.cos(thp)*dt
-        Gt = np.squeeze(np.array([[1.0, 0.0, jacob13[0]],\
-                                [0.0, 1.0, jacob12[0]],\
+        # jacob13 = -vt*math.sin(thp)*dt
+        # jacob12 = vt*math.cos(thp)*dt
+        Gt = np.squeeze(np.array([[1.0, 0.0, 0.0],\
+                                [0.0, 1.0, 0.0],\
                                 [0.0, 0.0, 1.0]]))
         return Gt
 

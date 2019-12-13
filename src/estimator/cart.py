@@ -32,13 +32,10 @@ class Cart:
         return Xt
 
     def get_vel(self, accel, omega, dt, noise = 1):
-        # print('a_n = ', accel[0])
+
         self.vt = self.vt + accel*dt
-        # vt_mag = np.sqrt(self.vt[0]**2+self.vt[1]**2)
-        om_mag = omega[2]
-        # om_mag = np.array([0.0])
-        vt_mag = np.array([1.6])
-        Ut = np.array([vt_mag, om_mag])
+
+        Ut = self.vt
 
         return Ut
 
