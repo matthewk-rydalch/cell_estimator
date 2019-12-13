@@ -21,4 +21,8 @@
 		<param name="path" value="$(find cell_estimator)"/>
 	</node>
 
+	<node name="live_plotter" pkg="cell_estimator" type="livePlotter.py" output="screen">
+		<param name="path" value="$(find cell_estimator)"/>
+	</node>
+
 </launch>

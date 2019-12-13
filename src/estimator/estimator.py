@@ -1,4 +1,5 @@
 import rospy
+from cell_estimator.msg import RelPos
 import numpy as np
 from importlib import reload, import_module
 import math
@@ -56,6 +57,11 @@ class Estimator():
         self.viz = viz
         self.Filter = Filter
 
+        # ROS stuff (sorry I did't want to try and figure out a better way to do this)
+        self.pub_Mu = rospy.Publisher('Mu', RelPos, queue_size=1024)
+        # self.pub_NED = rospy.Publisher('NED', RelPos, queue_size=1024)
+
+
     def imu_callback(self, data):
         accel_x = data.linear_acceleration.x
         accel_y = data.linear_acceleration.y
@@ -77,6 +83,12 @@ class Estimator():
         self.Mu_hist.append(self.Mu)
         self.Sig_hist.append(self.Sig)
         self.cell_time_hist.append(time)
+        # print("MU propagation:", self.Mu)
+        MU = RelPos()
+        MU.relPosNED[0] = self.Mu[0]
+        MU.relPosNED[1] = self.Mu[1]
+        MU.relPosNED[2] = self.Mu[2]
+        self.pub_Mu.publish(MU)
         #visualization()
         printer('got imu')
 
@@ -87,6 +99,7 @@ class Estimator():
         time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
         # print('sigma = ', self.Sig)
         self.Mu, self.Sig = self.Filter.measure(self.Mu, self.Sig, Zt)
+        print("MU measurement:", self.Mu)
         # print('sigma post= ', self.Sig)
         self.Mu_hist.append(self.Mu)
         self.Sig_hist.append(self.Sig)

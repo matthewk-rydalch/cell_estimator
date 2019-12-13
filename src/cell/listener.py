@@ -114,7 +114,7 @@ class udp_receiver():
 
     def base_lla_callback(self, msg):
         self.base_lat = msg.lla[0]*val.d2r
-        self.base_lon = msg.lla[1]*val.d2r
+        self.base_lon = -msg.lla[1]*val.d2r
         self.base_alt = msg.lla[2]
         self.chi = np.sqrt( 1 - val.e_frst_num_ecc * np.sin(self.base_lat) * np.sin(self.base_lat) )
         self.xr = ( val.e_smaj / self.chi + self.base_alt ) * np.cos(self.base_lat) * np.cos(self.base_lon)
@@ -124,7 +124,7 @@ class udp_receiver():
         self.BASE_FOUND = True
 
     def GPS2NED(self, lat, lon, alt):
-        lon_deg = lon   # Longitude
+        lon_deg = -lon   # Longitude
         lat_deg = lat     # Latitude
         alt = alt         # Altitude
 
