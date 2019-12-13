@@ -1,0 +1,9 @@
+%time,field.header.seq,field.header.stamp,field.header.frame_id,field.level,field.name,field.msg,field.file,field.function,field.line,field.topics0
+1576083075677430959,2,1576083075642275000,,2,/rover/record,Subscribing to /rosout,/tmp/binarydeb/ros-melodic-rosbag-1.14.3/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,210,/rosout
+1576083075677484167,3,1576083075646999542,,2,/rover/record,Subscribing to /rosout_agg,/tmp/binarydeb/ros-melodic-rosbag-1.14.3/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,210,/rosout
+1576083075677695959,4,1576083075651435625,,2,/rover/record,Subscribing to /rover/PosVelEcef,/tmp/binarydeb/ros-melodic-rosbag-1.14.3/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,210,/rosout
+1576083075677722542,5,1576083075655596125,,2,/rover/record,Subscribing to /rover/SurveyStatus,/tmp/binarydeb/ros-melodic-rosbag-1.14.3/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,210,/rosout
+1576083075677834209,6,1576083075659796542,,2,/rover/record,Subscribing to /rover/GlonassEphemeris,/tmp/binarydeb/ros-melodic-rosbag-1.14.3/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,210,/rosout
+1576083075677879250,7,1576083075664073750,,2,/rover/record,Subscribing to /rover/Ephemeris,/tmp/binarydeb/ros-melodic-rosbag-1.14.3/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,210,/rosout
+1576083075678028792,8,1576083075668346250,,2,/rover/record,Subscribing to /rover/Obs,/tmp/binarydeb/ros-melodic-rosbag-1.14.3/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,210,/rosout
+1576083075678065542,9,1576083075672604500,,2,/rover/record,Subscribing to /rover/PosVelTime,/tmp/binarydeb/ros-melodic-rosbag-1.14.3/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,210,/rosout

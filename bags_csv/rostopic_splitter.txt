@@ -1,0 +1,2 @@
+for bag in *bag; do for topic in `rostopic list -b $bag` ; do rostopic echo -p -b $bag $topic >${bag%.bag}${topic//\//_}.csv ; done; done
+
