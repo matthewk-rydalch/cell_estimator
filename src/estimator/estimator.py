@@ -6,8 +6,8 @@ from numpy.linalg import inv
 from IPython.core.debugger import set_trace
 
 
-multirotor = reload(import_module("multirotor"))
-from multirotor import Multirotor
+cart = reload(import_module("cart"))
+from cart import Cart
 visualizer = reload(import_module("visualizer"))
 from visualizer import Visualizer
 eif = reload(import_module("eif"))
@@ -29,10 +29,6 @@ class Estimator():
         sig_gps = 3 #m
         sig_accel = 1 #m/s^2
         sig_gyro = 1 #m^2/s^2
-        # sig_r = 0.2 #m
-        # sig_phi = 0.1 #rad
-        # sig_v = 0.15 #m/s
-        # sig_w = 0.1 #rad/s
         N0 = 0.0 #m
         E0 = 0.0 #m
         th0 = 0.0 #rad
@@ -52,7 +48,7 @@ class Estimator():
         Z_hist = []
 
         #instantiate classes
-        mr = Multirotor(sig_accel, sig_gyro, sig_gps)
+        cart = Cart(sig_accel, sig_gyro, sig_gps)
         viz = Visualizer(xlim, ylim)
         Filter = Eif(mr.dyn_2d, mr.model_sensor, self.prediction_jacobians, self.measurement_jacobians, sig_accel, sig_gyro, sig_gps)
         self.mr = mr
@@ -89,24 +85,6 @@ class Estimator():
     def rover_RelPos_callback(self, data):
         #this line is simply to verify that messages are being subscribed to during development
         printer("rover_RelPos_callback \n")
-
-    # def get_vel(self):
-
-    # def measurement(self, ned):
-    #     #measurement step for each marker
-    #     mu_bar = g_function
-    #     no_noise = 0
-    #     h_function = self.model_sensor(mu_bar, no_noise)
-    #     for i in range(len(self.M[0])):
-    #         Ht, Qt = self.measurement_matrices(self.M[:,i], mu_bar)
-    #         #reassign Omg to Omg_bar until all markers are accounted for
-    #         Omg_bar = Omg_bar+Ht.T@inv(Qt)@Ht
-    #         #reassign Ks to Ks_bar until all markers are accounted for
-    #         Ks_bar = Ks_bar+Ht.T@inv(Qt)@(utils.wrap(np.array([Zt[:,i]]).T-np.array([h_function[:,i]]).T)+Ht@mu_bar)
-    #     Ks = Ks_bar
-    #     Omg = Omg_bar
-
-    #     return Ks, Omg
 
     def prediction_jacobians(self, Ut, Mu, dt):
 

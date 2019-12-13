@@ -44,18 +44,6 @@ def driver():
 	th0 = th0*math.pi/180
 	#alitude does not change
 
-	####need to get these parameters instead of using the parameters below.
-	# Xtr = self.Xtr #from rover/RelPos
-	# Rtr = self.Rtr #different measurement model.  Will come from cell/NED.  Make this N? range truth
-	# Phi_tr = self.Phi_tr #different measurement model.  Will come from cell/NED.  Make this E? bearing truth
-	# M = self.M #not needed for NE measurements.  Could use the base?
-	# V = self.V #velocity comes from integrating accel from imu
-	# vc = self.vc
-	# W = self.W #angular velocity comes from integrating angular accel from imu
-	# wc = self.wc
-	# Uc = self.Uc #just a combination of the two.
-	# Time = self.Time #comes from ROS?
-
 	#read in given data
 	path = rospy.get_param('/estimator/path')
 	given = sio.loadmat(path + '/src/estimator/midterm_data.mat')

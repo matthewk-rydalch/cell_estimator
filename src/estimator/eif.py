@@ -20,14 +20,15 @@ class Eif():
         self.sig_gyro = sig_gyro
         self.sig_gps = sig_gps
 
+    #this function is only used if using a driver that doesn't seperate prediction and measurement steps
     def ext_info_filter(self, Ksp, Omp, Ut, Zt):
 
+        #ToDo: fix these
         self.prediction(Ut, Omp, Ksp)
         self.measure()
 
     def prediction(self, Ut, Mu, Sig, dt):
         #convert to information form
-        # set_trace()
         Om = inv(Sig)
         Ks = Om@Mu
 
@@ -35,7 +36,7 @@ class Eif():
         Gt= self.prediction_jacobian(Ut, Mu, dt)
         Rt= self.propogation_matrices(Mu, dt)
         Omg_bar = inv(Gt@inv(Om)@Gt.T+Rt)
-        g_function = self.dyn_2d(Mu, Ut, dt) #g is needed for both prediction and measurement
+        g_function = self.dyn_2d(Mu, Ut, dt)
         Ks_bar = Omg_bar@g_function
 
         Ks = Ks_bar
@@ -57,9 +58,6 @@ class Eif():
         #reassign Omg to Omg_bar until all markers are accounted for
 
         Om_bar[0:2,0:2] = Om_bar[0:2,0:2]+Ht.T@inv(Qt)@Ht
-        #reassign Ks to Ks_bar until all markers are accounted for
-        # Ks_bar = Ks_bar+Ht.T@inv(Qt)@(utils.wrap(np.array([Zt]).T-np.array([h_function).T)+Ht@Mu_bar)
-        #h_function is equal to Zt so the difference is zero
         Ks_bar[0:2] = Ks_bar[0:2]+Ht.T@inv(Qt)@(Ht@Mu_bar[0:2])
         Ks = Ks_bar
         Om = Om_bar

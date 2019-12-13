@@ -9,7 +9,7 @@ from IPython.core.debugger import set_trace
 
 utils = reload(import_module("utils"))
 
-class Multirotor:
+class Cart:
     def __init__(self, sig_accel, sig_gyro, sig_gps):
         self.sig_accel = sig_accel
         self.sig_gyro = sig_gyro
@@ -36,7 +36,6 @@ class Multirotor:
         self.vt = self.vt + accel*dt
         vt_mag = np.sqrt(self.vt[0]**2+self.vt[1]**2)
         om_mag = omega[2]
-
         Ut = np.array([vt_mag, om_mag])
 
         return Ut
