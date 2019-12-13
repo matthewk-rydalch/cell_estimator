@@ -41,10 +41,12 @@ class plotter():
         self.rover_y = []
 
         # Define the limits for the plot
-        self.xmin = -30#self.param['plotter_xmin']
-        self.xmax = 10#self.param['plotter_xmax']
-        self.ymin = -30#self.param['plotter_ymin']
-        self.ymax = 10#self.param['plotter_ymax']
+        pos = 10
+        neg = 30
+        self.xmin = -neg#self.param['plotter_xmin']
+        self.xmax = pos#self.param['plotter_xmax']
+        self.ymin = -neg#self.param['plotter_ymin']
+        self.ymax = pos#self.param['plotter_ymax']
 
         # Make the figure and axis for animation
         self.plot_update_interval = 100#self.param['plot_update_interval']

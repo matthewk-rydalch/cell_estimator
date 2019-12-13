@@ -26,9 +26,9 @@ class Estimator():
         #parameters
         xlim = 30.0 #m
         ylim = 30.0 #m
-        sig_gps = 3.0 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
-        sig_accel = 0.4 #m/s^2
-        sig_gyro = 1.0 #deg/s^2
+        sig_gps = 0.1 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
+        sig_accel = 1.0#0.4 #m/s^2
+        sig_gyro = 10.0#1.0 #deg/s^2
         sig_gyro = sig_gyro*np.pi/180 #rad/s^2
         N0 = 0.0 #m
         E0 = 0.0 #m
@@ -89,7 +89,7 @@ class Estimator():
         printer('got imu')
 
     def ned_callback(self, data):
-        Zt = np.zeros((2,1))
+        Zt = np.zeros((3,1))
         Zt[0] = data.relPosNED[0]
         Zt[1] = data.relPosNED[1]
         time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
@@ -131,8 +131,9 @@ class Estimator():
 
     def measurement_jacobians(self, Mu_bar, Zt):
         #our model is linear
-        Ht = np.array([[1.0, 0.0],\
-                       [0.0, 1.0]])
+        Ht = np.eye(3)
+        # Ht = np.array([[1.0, 0.0],\
+        #                [0.0, 1.0]])
 
         return Ht
 
