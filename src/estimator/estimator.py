@@ -26,22 +26,25 @@ class Estimator():
         #parameters
         xlim = 30.0 #m
         ylim = 30.0 #m
-        sig_gps = 0.1 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
+        sig_gps = 0.5 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
         sig_accel = 1.0#0.4 #m/s^2
-        sig_gyro = 10.0#1.0 #deg/s^2
+        sig_gyro = 1.0#1.0 #deg/s^2
         sig_gyro = sig_gyro*np.pi/180 #rad/s^2
         N0 = 0.0 #m
         E0 = 0.0 #m
-        th0 = -np.pi/2 #rad
+        self.th0 = -np.pi/2 #rad
         #alitude does not change
         self.t_prev_imu = 0 #this is updated in imu callback #used to calculate dt
+        self.t_start = 0
+        self.prop_first = True
+        self.mu_first = True
 
     	#my specified parameters and variables
         self.Sig = np.array([[1.0, 0.0, 0.0],
                             [0.0, 1.0, 0.0],
                             [0.0, 0.0, 1.0]])
 
-        self.Mu = np.array([[N0],[E0],[th0]])
+        self.Mu = np.array([[N0],[E0],[self.th0]])
 
         self.Sig_hist = []
         self.Mu_hist = []
@@ -73,30 +76,38 @@ class Estimator():
         omega = np.array([[omega_x],[omega_y],[omega_z]])
         # set_trace()
         time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
-        if self.t_prev_imu != 0.0:
-            dt = (time-self.t_prev_imu)
-        else:
-            dt = 0.003
-        self.t_prev_imu = time
-        Ut = self.cart.get_vel(accel, omega, dt)
-        self.Mu, self.Sig = self.Filter.prediction(Ut, self.Mu, self.Sig, dt)
-        self.Mu_hist.append(self.Mu)
-        self.Sig_hist.append(self.Sig)
-        self.cell_time_hist.append(time)
-        # print("MU propagation:", self.Mu)
-        self.mu_publisher()
-        #visualization()
-        printer('got imu')
+        if self.prop_first:
+            self.t_start = time
+            self.prop_first = False
+        if time - self.t_start > 6.0:
+            if self.t_prev_imu != 0.0:
+                dt = (time-self.t_prev_imu)
+            else:
+                dt = 0.003
+            self.t_prev_imu = time
+            Ut = self.cart.get_vel(accel, omega, dt)
+            # print("MU propagation before:", self.Mu)
+            self.Mu, self.Sig = self.Filter.prediction(Ut, self.Mu, self.Sig, dt)
+            # print("MU propagation after:", self.Mu)
+            self.Mu_hist.append(self.Mu)
+            self.Sig_hist.append(self.Sig)
+            self.cell_time_hist.append(time)
+            self.mu_publisher()
+            #visualization()
+            printer('got imu')
 
     def ned_callback(self, data):
         Zt = np.zeros((3,1))
         Zt[0] = data.relPosNED[0]
         Zt[1] = data.relPosNED[1]
+        if self.mu_first:
+            Zt[2] = -np.pi/2.0
+            self.Mu = Zt
+            self.mu_first = False
         time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
-        # print('sigma = ', self.Sig)
+        print("MU measurement before:", self.Mu)
         self.Mu, self.Sig = self.Filter.measure(self.Mu, self.Sig, Zt)
-        # print("MU measurement:", self.Mu)
-        # print('sigma post= ', self.Sig)
+        print("MU measurement after:", self.Mu)
         self.Mu_hist.append(self.Mu)
         self.Sig_hist.append(self.Sig)
         self.cell_time_hist.append(time)
