@@ -22,94 +22,94 @@ def printer(str1, str2):
 class udp_receiver():
 
     def __init__(self):
-        # # Set our class attributes (persistant variables)
-        # self.udp_port = 5555
-        # self.buffer_size = 2048
+        # Set our class attributes (persistant variables)
+        self.udp_port = 5555
+        self.buffer_size = 2048
         self.BASE_FOUND = False
 
-        # # Define a socket listener to receive the radar packets
-        # self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # #  Open UDP Socket
-        # self.sock.bind(('', self.udp_port))
-        # self.sock.setblocking(True)
-        # print('UDP socket', str(self.udp_port), ' opened.')
+        # Define a socket listener to receive the radar packets
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        #  Open UDP Socket
+        self.sock.bind(('', self.udp_port))
+        self.sock.setblocking(True)
+        print('UDP socket', str(self.udp_port), ' opened.')
 
         # ROS stuff
         rospy.Subscriber('base/PosVelTime', PositionVelocityTime, self.base_lla_callback)
-        rospy.Subscriber('lla', PositionVelocityTime, self.lla_callback)
+        # rospy.Subscriber('lla', PositionVelocityTime, self.lla_callback)
         self.pub_imu = rospy.Publisher('imu', imu, queue_size=1024) #I just used the queue size from latis
         self.pub_NED = rospy.Publisher('NED', RelPos, queue_size=1024)
         self.pub_lla = rospy.Publisher('lla', PositionVelocityTime, queue_size=1024)
 
     def main_loop(self):
 
-        # #  Read in Data
-        # # while True:
-        # imu_data = imu()
-        # NED_data = RelPos()
-        # lla_data = PositionVelocityTime()
+        #  Read in Data
+        # while True:
+        imu_data = imu()
+        NED_data = RelPos()
+        lla_data = PositionVelocityTime()
 
-        # byteArray, addr = self.sock.recvfrom(self.buffer_size)
+        byteArray, addr = self.sock.recvfrom(self.buffer_size)
 
-        # info = str(byteArray)
+        info = str(byteArray)
 
-        # one = info.find(" 1, ")
-        # three = info.find(" 3, ")
-        # four = info.find(" 4, ")
-        # five = info.find(" 5, ")
+        one = info.find(" 1, ")
+        three = info.find(" 3, ")
+        four = info.find(" 4, ")
+        five = info.find(" 5, ")
 
-        # printer("Data:", info)
+        printer("Data:", info)
 
-        # if one != -1:
-        #     gps = info[one:three-2].split(',')
-        #     printer("data:", gps)
-        #     lat = float(gps[1])
-        #     lon = float(gps[2])
-        #     alt = float(gps[3])
-        #     printer("lat:", lat)
-        #     printer("lon:", lon)
-        #     printer("alt:", alt)
-        #     lla_data.lla[0] = lat
-        #     lla_data.lla[1] = lon
-        #     lla_data.lla[2] = alt
-        #     lla_data.header.stamp = rospy.Time.now()
-        #     self.pub_lla.publish(lla_data)
-        #     if self.BASE_FOUND:
-        #         ned = self.GPS2NED(lat,lon,alt)
-        #         NED_data.relPosNED[0] = ned[0]
-        #         NED_data.relPosNED[1] = ned[1]
-        #         NED_data.relPosNED[2] = ned[2]
-        #         NED_data.header.stamp = rospy.Time.now()
-        #         self.pub_NED.publish(NED_data)
+        if one != -1:
+            gps = info[one:three-2].split(',')
+            printer("data:", gps)
+            lat = float(gps[1])
+            lon = float(gps[2])
+            alt = float(gps[3])
+            printer("lat:", lat)
+            printer("lon:", lon)
+            printer("alt:", alt)
+            lla_data.lla[0] = lat
+            lla_data.lla[1] = lon
+            lla_data.lla[2] = alt
+            lla_data.header.stamp = rospy.Time.now()
+            self.pub_lla.publish(lla_data)
+            if self.BASE_FOUND:
+                ned = self.GPS2NED(lat,lon,alt)
+                NED_data.relPosNED[0] = ned[0]
+                NED_data.relPosNED[1] = ned[1]
+                NED_data.relPosNED[2] = ned[2]
+                NED_data.header.stamp = rospy.Time.now()
+                self.pub_NED.publish(NED_data)
 
-        # if three != -1:
-        # 	accel = info[three:four-2].split(',')
-        # 	printer("Accel:", accel)
-        # 	x_accel = float(accel[1])
-        # 	y_accel = float(accel[2])
-        # 	z_accel = float(accel[3])
-        # 	printer("x accel:", x_accel)
-        # 	printer("y accel:", y_accel)
-        # 	printer("z accel:", z_accel)
-        # 	imu_data.linear_acceleration.x = x_accel
-        # 	imu_data.linear_acceleration.y = y_accel
-        # 	imu_data.linear_acceleration.z = z_accel
+        if three != -1:
+        	accel = info[three:four-2].split(',')
+        	printer("Accel:", accel)
+        	x_accel = float(accel[1])
+        	y_accel = float(accel[2])
+        	z_accel = float(accel[3])
+        	printer("x accel:", x_accel)
+        	printer("y accel:", y_accel)
+        	printer("z accel:", z_accel)
+        	imu_data.linear_acceleration.x = x_accel
+        	imu_data.linear_acceleration.y = y_accel
+        	imu_data.linear_acceleration.z = z_accel
 
-        # if four != -1:
-        #     gyro = info[four:five-2].split(',')
-        #     printer("Gyro:", gyro)
-        #     x_gyro = float(gyro[1])
-        #     y_gyro = float(gyro[2])
-        #     z_gyro = float(gyro[3])
-        #     printer("x gyro:", x_gyro)
-        #     printer("y gyro:", y_gyro)
-        #     printer("z gyro:", z_gyro)
-        #     imu_data.angular_velocity.x = x_gyro
-        #     imu_data.angular_velocity.y = y_gyro
-        #     imu_data.angular_velocity.z = z_gyro
-        #     imu_data.header.stamp = rospy.Time.now()
-        #     print("time", rospy.Time.now())
-        #     self.pub_imu.publish(imu_data)
+        if four != -1:
+            gyro = info[four:five-2].split(',')
+            printer("Gyro:", gyro)
+            x_gyro = float(gyro[1])
+            y_gyro = float(gyro[2])
+            z_gyro = float(gyro[3])
+            printer("x gyro:", x_gyro)
+            printer("y gyro:", y_gyro)
+            printer("z gyro:", z_gyro)
+            imu_data.angular_velocity.x = x_gyro
+            imu_data.angular_velocity.y = y_gyro
+            imu_data.angular_velocity.z = z_gyro
+            imu_data.header.stamp = rospy.Time.now()
+            print("time", rospy.Time.now())
+            self.pub_imu.publish(imu_data)
         printer("Done reading.", self.BASE_FOUND)
 
     def base_lla_callback(self, msg):
@@ -165,23 +165,23 @@ class udp_receiver():
     # def run_receiver(self):
     #     self.main_loop()
 
-    def lla_callback(self, msg):
-        NED_data = RelPos()
-
-        lat = msg.lla[0]
-        lon = msg.lla[1]
-        alt = msg.lla[2]
-        time = msg.header.stamp
-
-        if self.BASE_FOUND:
-            ned = self.GPS2NED(lat,lon,alt)
-            NED_data.relPosNED[0] = ned[0]
-            NED_data.relPosNED[1] = ned[1]
-            NED_data.relPosNED[2] = ned[2]
-            NED_data.header.stamp = time
-            printer("NED = ", NED_data)
-            printer("ned = ", ned)
-            self.pub_NED.publish(NED_data)
+    # def lla_callback(self, msg):
+    #     NED_data = RelPos()
+    #
+    #     lat = msg.lla[0]
+    #     lon = msg.lla[1]
+    #     alt = msg.lla[2]
+    #     time = msg.header.stamp
+    #
+    #     if self.BASE_FOUND:
+    #         ned = self.GPS2NED(lat,lon,alt)
+    #         NED_data.relPosNED[0] = ned[0]
+    #         NED_data.relPosNED[1] = ned[1]
+    #         NED_data.relPosNED[2] = ned[2]
+    #         NED_data.header.stamp = time
+    #         printer("NED = ", NED_data)
+    #         printer("ned = ", ned)
+    #         self.pub_NED.publish(NED_data)
 
 
 
