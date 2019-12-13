@@ -6,11 +6,11 @@
 	</group>
 
 	<group ns="rover">
-		<node pkg="rosbag" type="play" name="f9p" args="--clock $(find cell_estimator)/bags/rover5.bag"/>
+		<node pkg="rosbag" type="play" name="f9p" args="--clock $(find cell_estimator)/bags/rover6.bag"/>
 	</group>
 
 	<!-- <group ns="cell"> -->
-	<node pkg="rosbag" type="play" name="cell_data" args="--clock $(find cell_estimator)/bags/cell5.bag"/>
+	<node pkg="rosbag" type="play" name="cell_data" args="--clock $(find cell_estimator)/bags/cell6.bag"/>
 	<!-- </group> -->
 
 	<!-- <group ns="cell"> -->
