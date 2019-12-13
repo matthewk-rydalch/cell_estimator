@@ -5,17 +5,15 @@
 		<node pkg="rosbag" type="play" name="f9p" args="--clock $(find cell_estimator)/bags/base2.bag"/>
 	</group>
 
-	<group ns="rover">
-		<node pkg="rosbag" type="play" name="f9p" args="--clock $(find cell_estimator)/bags/rover6.bag"/>
-	</group>
-
-	<!-- <group ns="cell"> -->
-	<node pkg="rosbag" type="play" name="cell_data" args="--clock $(find cell_estimator)/bags/cell6.bag"/>
+	<!-- <group ns="rover"> -->
+		<!-- <node pkg="rosbag" type="play" name="f9p" args="dashdashclock $(find cell_estimator)/bags/rover6.bag"/> -->
 	<!-- </group> -->
 
-	<!-- <group ns="cell"> -->
+	<!-- <node pkg="rosbag" type="play" name="cell_data" args="dashdashclock $(find cell_estimator)/bags/cell6.bag"/> -->
+
+	<node pkg="rosbag" type="play" name="data" args="--clock $(find cell_estimator)/bags/truncate2.bag"/>
+
 	<node name="cell" pkg="cell_estimator" type="cell_ros.py" output="screen"/>
-	<!-- </group> -->
 
 	<node name="estimator" pkg="cell_estimator" type="estimator_ros.py" output="screen">
 		<param name="path" value="$(find cell_estimator)"/>

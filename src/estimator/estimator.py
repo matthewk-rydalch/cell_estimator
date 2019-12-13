@@ -32,7 +32,7 @@ class Estimator():
         sig_gyro = sig_gyro*np.pi/180 #rad/s^2
         N0 = 0.0 #m
         E0 = 0.0 #m
-        th0 = -np.pi/2 #rad
+        th0 = 0#np.pi/2 #rad
         #alitude does not change
         self.t_prev_imu = 0 #this is updated in imu callback #used to calculate dt
 

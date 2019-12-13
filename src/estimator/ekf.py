@@ -42,7 +42,7 @@ class Ekf():
         Ht= self.measurement_jacobian(Mu_bar, Zt)
         if self.first:
             self.zt_prev=Zt
-            self.zt_prev[2] = -np.pi/2
+            self.zt_prev[2] = 0#np.pi/2
         Zt[2]=-utils.wrap(np.arctan2(Zt[0]-self.zt_prev[0],Zt[1]-self.zt_prev[1])-np.pi/2)
         self.zt_prev = Zt
         Qt = self.measurement_matrices()
