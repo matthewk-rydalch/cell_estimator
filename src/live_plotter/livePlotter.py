@@ -58,7 +58,7 @@ class plotter():
         rospy.Subscriber('NED', RelPos, self.ned_callback, queue_size=10)
         rospy.Subscriber('Mu', RelPos, self.Mu_callback, queue_size=10)
         rospy.Subscriber('/rover/RelPos', RelPos, self.rover_callback, queue_size=10)
-        
+
 
         # Start the Plotting
         plt.show()
@@ -78,7 +78,7 @@ class plotter():
         self.ax1.plot(self.ned_x, self.ned_y, 'r.')
         self.ax1.plot(self.Mu_x, self.Mu_y, 'b.')
         self.ax1.plot(self.rover_x, self.rover_y, 'g.')
-        
+
         ############################################################################
         # Stuff for plotting ellipses
         if self.Plot_Ellipses:

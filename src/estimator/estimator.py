@@ -29,9 +29,18 @@ class Estimator():
         ylim = 30.0 #m
         sig_gps = 0.1 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
         sig_gps_heading = 1.0 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
-        sig_accel = 1.0#0.4 #m/s^2
-        sig_gyro = 1.0 * val.d2r#1.0 #deg/s^2
-        # sig_gyro = sig_gyro*np.pi/180 #rad/s^2
+        sig_accel = 1.0 #m/s^2
+        sig_gyro = 1.0 * val.d2r
+
+        self.omega_bound = 0.02
+        self.gyro_high = 0.5 * val.d2r
+        self.gyro_low = 10.0 * val.d2r
+        self.gps_heading_high = 0.5
+        self.gps_heading_low = 20.0
+        self.gps_high = sig_gps-0.05
+        self.gps_low = sig_gps
+
+
         N0 = 0.0 #m
         E0 = 0.0 #m
         self.th0 = -np.pi/2 #rad
@@ -76,19 +85,20 @@ class Estimator():
         omega_y = data.angular_velocity.y
         omega_z = -data.angular_velocity.z
         omega = np.array([[omega_x],[omega_y],[omega_z]])
-        if np.abs(omega_z)>0.05:
-            self.Filter.sig_gyro = 1.0 * val.d2r
-            self.Filter.sig_gps_heading = 15.0
-            print("omega:", omega)
+        if np.abs(omega_z)>self.omega_bound:
+            self.Filter.sig_gyro = self.gyro_high
+            self.Filter.sig_gps_heading = self.gps_heading_low
+            self.Filter.sig_gps = self.gps_low
         else:
-            self.Filter.sig_gyro = 10.0 * val.d2r
-            self.Filter.sig_gps_heading = 0.5
+            self.Filter.sig_gyro = self.gyro_low
+            self.Filter.sig_gps_heading = self.gps_heading_high
+            self.Filter.sig_gps = self.gps_high
         # set_trace()
         time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
         if self.prop_first:
             self.t_start = time
             self.prop_first = False
-        if time - self.t_start > 6.0:
+        if time - self.t_start > 7.0:
             if self.t_prev_imu != 0.0:
                 dt = (time-self.t_prev_imu)
             else:
