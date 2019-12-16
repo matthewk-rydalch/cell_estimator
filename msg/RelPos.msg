@@ -1,5 +1,5 @@
 #We are only really using this message for relPosNED and time
-#but to keep it consistant with UBLOX_READ (rtk) we will create the whole message 
+#but to keep it consistant with UBLOX_READ (rtk) we will create the whole message
 
 Header header
 

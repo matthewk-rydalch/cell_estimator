@@ -1,11 +1,13 @@
 import rospy
 from cell_estimator.msg import RelPos
+from cell_estimator.msg import imu
 import numpy as np
 from importlib import reload, import_module
 import math
 from numpy.linalg import inv
 from IPython.core.debugger import set_trace
 import val
+import time
 
 
 cart = reload(import_module("cart"))
@@ -51,9 +53,10 @@ class Estimator():
         self.mu_first = True
 
     	#my specified parameters and variables
-        self.Sig = np.array([[1.0, 0.0, 0.0],
-                            [0.0, 1.0, 0.0],
-                            [0.0, 0.0, 1.0]])
+        self.Sig = np.diag([1.0,1.0,1.0])*1e2
+        # self.Sig = np.array([[1.0, 0.0, 0.0],
+        #                     [0.0, 1.0, 0.0],
+        #                     [0.0, 0.0, 1.0]])
 
         self.Mu = np.array([[N0],[E0],[self.th0]])
 
@@ -73,7 +76,7 @@ class Estimator():
 
         # ROS stuff (sorry I did't want to try and figure out a better way to do this)
         self.pub_Mu = rospy.Publisher('Mu', RelPos, queue_size=1024)
-        # self.pub_NED = rospy.Publisher('NED', RelPos, queue_size=1024)
+        self.pub_SIG = rospy.Publisher('SIG', imu, queue_size=1024)
 
 
     def imu_callback(self, data):
@@ -105,13 +108,12 @@ class Estimator():
                 dt = 0.003
             self.t_prev_imu = time
             Ut = self.cart.get_vel(accel, omega, dt)
-            # print("MU propagation before:", self.Mu)
             self.Mu, self.Sig = self.Filter.prediction(Ut, self.Mu, self.Sig, dt)
-            # print("MU propagation after:", self.Mu)
             self.Mu_hist.append(self.Mu)
             self.Sig_hist.append(self.Sig)
             self.cell_time_hist.append(time)
             self.mu_publisher()
+            self.SIG_publisher()
             #visualization()
             printer('got imu')
 
@@ -124,14 +126,11 @@ class Estimator():
             self.Mu = Zt
             self.mu_first = False
         time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
-        printer("MU measurement before:", self.Mu)
         self.Mu, self.Sig = self.Filter.measure(self.Mu, self.Sig, Zt)
-        printer("MU measurement after:", self.Mu)
-        self.Mu_hist.append(self.Mu)
         self.Sig_hist.append(self.Sig)
         self.cell_time_hist.append(time)
         self.mu_publisher()
-        printer('got ned')
+        self.SIG_publisher()
 
     def lla_callback(self, data):
         #this line is simply to verify that messages are being subscribed to during development
@@ -173,3 +172,8 @@ class Estimator():
         MU.relPosNED[1] = self.Mu[1]
         MU.relPosNED[2] = self.Mu[2]
         self.pub_Mu.publish(MU)
+
+    def SIG_publisher(self):
+        sig = imu()
+        sig.orientation_covariance = self.Sig.flatten()
+        self.pub_SIG.publish(sig)
