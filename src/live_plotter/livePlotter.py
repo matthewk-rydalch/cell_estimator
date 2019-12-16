@@ -25,7 +25,7 @@ class plotter():
         self.units = 1#self.param['radar_units']
 
         # Stuff for plotting covariance ellipses around RRANSAC tracks
-        self.Plot_Ellipses = False#self.param['plot_ellipses']
+        self.Plot_Ellipses = True#self.param['plot_ellipses']
         if self.Plot_Ellipses:
             circle = np.arange(0., 2 * np.pi, 0.1)
             self.x_points_cir = np.cos(circle)
