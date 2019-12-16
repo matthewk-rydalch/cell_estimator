@@ -32,7 +32,8 @@ class Estimator():
         sig_gyro = sig_gyro*np.pi/180 #rad/s^2
         N0 = 0.0 #m
         E0 = 0.0 #m
-        self.th0 = -np.pi/2 #rad
+        D0 = 0.0
+        # self.th0 = -np.pi/2 #rad
         #alitude does not change
         self.t_prev_imu = 0 #this is updated in imu callback #used to calculate dt
         self.t_start = 0
@@ -44,7 +45,7 @@ class Estimator():
                             [0.0, 1.0, 0.0],
                             [0.0, 0.0, 1.0]])
 
-        self.Mu = np.array([[N0],[E0],[self.th0]])
+        self.Mu = np.array([[N0],[E0],[D0]])
 
         self.Sig_hist = []
         self.Mu_hist = []
@@ -79,35 +80,32 @@ class Estimator():
         if self.prop_first:
             self.t_start = time
             self.prop_first = False
-        if time - self.t_start > 6.0:
-            if self.t_prev_imu != 0.0:
-                dt = (time-self.t_prev_imu)
-            else:
-                dt = 0.003
-            self.t_prev_imu = time
-            Ut = self.cart.get_vel(accel, omega, dt)
-            # print("MU propagation before:", self.Mu)
-            self.Mu, self.Sig = self.Filter.prediction(Ut, self.Mu, self.Sig, dt)
-            # print("MU propagation after:", self.Mu)
-            self.Mu_hist.append(self.Mu)
-            self.Sig_hist.append(self.Sig)
-            self.cell_time_hist.append(time)
-            self.mu_publisher()
-            #visualization()
-            printer('got imu')
+        # if time - self.t_start > 6.0:
+        if self.t_prev_imu != 0.0:
+            dt = (time-self.t_prev_imu)
+        else:
+            dt = 0.003
+        self.t_prev_imu = time
+        Ut = self.cart.get_vel(accel, omega, dt, time)
+        # print("MU propagation before:", self.Mu)
+        self.Mu, self.Sig = self.Filter.prediction(Ut, self.Mu, self.Sig, dt)
+        # print("MU propagation after:", self.Mu)
+        self.Mu_hist.append(self.Mu)
+        self.Sig_hist.append(self.Sig)
+        self.cell_time_hist.append(time)
+        self.mu_publisher()
+        #visualization()
+        printer('got imu')
 
     def ned_callback(self, data):
         Zt = np.zeros((3,1))
         Zt[0] = data.relPosNED[0]
         Zt[1] = data.relPosNED[1]
-        if self.mu_first:
-            Zt[2] = -np.pi/2.0
-            self.Mu = Zt
-            self.mu_first = False
+        Zt[2] = data.relPosNED[2]
         time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
-        print("MU measurement before:", self.Mu)
+        # print("MU measurement before:", self.Mu)
         self.Mu, self.Sig = self.Filter.measure(self.Mu, self.Sig, Zt)
-        print("MU measurement after:", self.Mu)
+        # print("MU measurement after:", self.Mu)
         self.Mu_hist.append(self.Mu)
         self.Sig_hist.append(self.Sig)
         self.cell_time_hist.append(time)
@@ -120,12 +118,12 @@ class Estimator():
         printer('got lla')
 
     def rover_RelPos_callback(self, data):
-        time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
-        self.rover_time_hist.append(time)
-        Pt = [0]*2
-        Pt[0] = data.relPosNED[0]
-        Pt[1] = data.relPosNED[1]
-        self.rover_pos_hist.append(Pt)
+        # time = data.header.stamp.secs+data.header.stamp.nsecs*1E-9
+        # self.rover_time_hist.append(time)
+        # Pt = [0]*2
+        # Pt[0] = data.relPosNED[0]
+        # Pt[1] = data.relPosNED[1]
+        # self.rover_pos_hist.append(Pt)
         #this line is simply to verify that messages are being subscribed to during development
         printer("rover_RelPos_callback \n")
 

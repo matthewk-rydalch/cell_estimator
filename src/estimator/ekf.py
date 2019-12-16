@@ -40,17 +40,10 @@ class Ekf():
 
     def measure(self, Mu_bar, Sig_bar, Zt):
         Ht= self.measurement_jacobian(Mu_bar, Zt)
-        if self.first:
-            self.zt_prev=Zt
-            self.zt_prev[2] = -np.pi/2
-            self.first = False
-        Zt[2]=utils.wrap(np.arctan2(Zt[0]-self.zt_prev[0],Zt[1]-self.zt_prev[1])-np.pi/2)
-        print('Zt = ', Zt)
-        self.zt_prev = Zt
         Qt = self.measurement_matrices()
         St = Ht@Sig_bar@Ht.T+Qt
         Kt = Sig_bar@Ht.T@inv(St)
-        z_hat = np.hstack([(Zt[0:2]-Mu_bar[0:2]).T, np.array([utils.wrap(Zt[2]-Mu_bar[2])]).T]).T
+        z_hat = Zt-Mu_bar
         Mu_bar = Mu_bar+Kt@(z_hat)
         # set_trace()
         Sig_bar = (np.eye(3)-Kt@Ht)@Sig_bar

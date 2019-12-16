@@ -41,8 +41,8 @@ class plotter():
         self.rover_y = []
 
         # Define the limits for the plot
-        pos = 10
-        neg = 30
+        pos = 100
+        neg = 100
         self.xmin = -neg#self.param['plotter_xmin']
         self.xmax = pos#self.param['plotter_xmax']
         self.ymin = -neg#self.param['plotter_ymin']

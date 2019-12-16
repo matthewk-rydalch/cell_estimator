@@ -14,25 +14,31 @@ class Cart:
         self.sig_accel = sig_accel
         self.sig_gyro = sig_gyro
         self.sig_gps = sig_gps
-        self.vt = np.array([[0],[0],[0]]) #this needs to be remembered to calculate the next time step.  It is changed in get_vel
+        self.vt = np.array([[0.0],[0.0],[0.0]]) #this needs to be remembered to calculate the next time step.  It is changed in get_vel
+        self.first_accel = np.array([[0.0], [0.0], [0,0]])
 
     def dyn_2d(self, Xp, Ut, dt):
 
         Np = Xp[0][0]
         Ep = Xp[1][0]
-        thp = Xp[2][0]
-        vt = Ut[0]
-        wt = Ut[1]
+        Dp = Xp[2][0]
+        Nv = Ut[0]
+        Ev = Ut[1]
+        Dv = Ut[2]
 
-        Nt = Np+(vt*math.cos(thp))*dt
-        Et = Ep+(vt*math.sin(thp))*dt
-        tht = thp+wt*dt
+        Nt = Np+Nv*dt
+        Et = Ep+Ev*dt
+        Dt = Dp+Dv*dt
 
-        Xt = np.array([Nt, Et, tht])
+        Xt = np.array([Nt, Et, Dt])
         return Xt
 
-    def get_vel(self, accel, omega, dt, noise = 1):
+    def get_vel(self, accel, omega, dt, time):
 
+        if time < 1.0:
+            set_trace()
+            self.first_accel = accel
+        accel = accel-self.first_accel
         self.vt = self.vt + accel*dt
 
         Ut = self.vt
