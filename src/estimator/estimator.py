@@ -27,18 +27,25 @@ class Estimator():
         #parameters
         xlim = 30.0 #m
         ylim = 30.0 #m
-        sig_gps = 0.1 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
-        sig_gps_heading = 1.0 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
-        sig_accel = 1.0 #m/s^2
-        sig_gyro = 1.0 * val.d2r
+        sig_gps = 4.0 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
+        sig_gps_heading = 0.01 #m #sensor values are rough estimates from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017405/
+        sig_accel = 5.0 #m/s^2
+        sig_gyro = 10.0 * val.d2r
 
-        self.omega_bound = 0.02
-        self.gyro_high = 0.5 * val.d2r
-        self.gyro_low = 10.0 * val.d2r
-        self.gps_heading_high = 0.5
-        self.gps_heading_low = 20.0
-        self.gps_high = sig_gps-0.05
+        self.omega_bound = 10.0
+        self.gyro_high = sig_gyro
+        self.gyro_low = sig_gyro
+        self.gps_heading_high = sig_gps_heading
+        self.gps_heading_low = sig_gps_heading
+        self.gps_high = sig_gps
         self.gps_low = sig_gps
+        # self.omega_bound = 0.02
+        # self.gyro_high = 1.0 * val.d2r
+        # self.gyro_low = 10.0 * val.d2r
+        # self.gps_heading_high = 5.0
+        # self.gps_heading_low = 20.0
+        # self.gps_high = sig_gps-0.05
+        # self.gps_low = sig_gps
 
 
         N0 = 0.0 #m
